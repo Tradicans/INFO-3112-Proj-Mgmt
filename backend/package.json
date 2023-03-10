@@ -6,6 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Amber Rose",
-  "license": "ISC"
+  "author": "Amber Rose, Gavin Guerette and git master Ryan McCormick",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "graphql": "^16.6.0",
+    "mercurius": "^12.2.0",
+    "mongodb": "^5.1.0"
+  }
 }
