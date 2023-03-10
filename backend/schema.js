@@ -7,7 +7,7 @@ type Query {
 
     sprints: [Sprint],
 
-    product: [Product],
+    products: [Product],
 
     stories: [Story],
 
