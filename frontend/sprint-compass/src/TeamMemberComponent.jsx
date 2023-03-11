@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import {
 	Card,

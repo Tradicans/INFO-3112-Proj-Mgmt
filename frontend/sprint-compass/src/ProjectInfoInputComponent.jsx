@@ -26,6 +26,7 @@ const ProjectInfoInputComponent = (props) => {
 	const [state, setState] = useReducer(reducer, initialState);
 	const onAddClicked = async () => {
 		//code to send info to db here
+		//todo: add empty values for missing properties to complete schema
 		let query = JSON.stringify({
 			query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
 	   { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,

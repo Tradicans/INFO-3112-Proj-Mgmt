@@ -18,6 +18,7 @@ import theme from "./theme";
 import HomeComponent from "./HomeComponent";
 import ProjectInfoInputComponent from "./ProjectInfoInputComponent";
 import TeamMemberComponent from "./TeamMemberComponent";
+import BacklogComponent from "./BacklogComponent";
 
 const App = () => {
 	const [anchorEl, setAnchorEl] = useState(null);
@@ -57,6 +58,9 @@ const App = () => {
 						<MenuItem component={NavLink} to="/team" onClick={handleClose}>
 							Team Members
 						</MenuItem>
+						<MenuItem component={NavLink} to="/backlog" onClick={handleClose}>
+							Product Backlog
+						</MenuItem>
 					</Menu>
 				</Toolbar>
 			</AppBar>
@@ -65,6 +69,7 @@ const App = () => {
 				<Route path="/home" element={<HomeComponent />} />
 				<Route path="/infoinput" element={<ProjectInfoInputComponent />} />
 				<Route path="/team" element={<TeamMemberComponent />} />
+				<Route path="/backlog" element={<BacklogComponent />} />
 			</Routes>
 		</ThemeProvider>
 	);
