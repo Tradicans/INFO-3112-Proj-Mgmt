@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import {
 	Card,
@@ -17,6 +17,7 @@ import AddCircle from "@mui/icons-material/AddCircle";
 import theme from "./theme";
 import "./App.css";
 import HomeComponent from "./HomeComponent";
+import queryFunction from "./queryfunction";
 
 const TeamMemberComponent = (props) => {
 	const initialState = {
@@ -26,14 +27,33 @@ const TeamMemberComponent = (props) => {
 		showAddCard: false,
 		newName: "",
 	};
+
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
+	//todo: uncomment when query can be used
+	// useEffect(() => {
+	// 	readTeamArray();
+	// }, []);
+	const readTeamArray = async () => {
+		//load existing array if exists
+		let query = JSON.stringify({
+			query: `query {products{teammembers}}`,
+		});
+		let json = await queryFunction(query);
+		//todo: check this returns just the team array of names as expected
+		setState({ teamArray: json.data.products.teammembers });
+		//todo: error handling if needed if query returns null, still need page to load
+	};
 	const onCancelClicked = () => {
 		closeModal();
 	};
 	const onAddClicked = async () => {
 		//todo: code to add team member to db
-		//
+		//need to pull existing array with one query, add teammember, then a second query to return modified array?
+		let query = JSON.stringify({
+			query: ``,
+		});
+		let json = await queryFunction(query);
 		//reset name
 		setState({ newName: "" });
 		closeModal();
@@ -61,7 +81,7 @@ const TeamMemberComponent = (props) => {
 						<CardContent>
 							<div style={{ textAlign: "center" }}>
 								<TextField
-									style={{ margin: "1vw" }}
+									style={{ margin: "1vw", width: "52vw" }}
 									onChange={handleNewNameInput}
 									placeholder="Team Member Name"
 									value={state.newName}
@@ -69,6 +89,7 @@ const TeamMemberComponent = (props) => {
 							</div>
 							<div style={{ textAlign: "center" }}>
 								<Button
+									style={{ margin: "1vw", width: "25vw" }}
 									color="secondary"
 									variant="contained"
 									onClick={onCancelClicked}
@@ -76,6 +97,7 @@ const TeamMemberComponent = (props) => {
 									Cancel
 								</Button>
 								<Button
+									style={{ margin: "1vw", width: "25vw" }}
 									color="secondary"
 									variant="contained"
 									onClick={onAddClicked}
@@ -92,11 +114,11 @@ const TeamMemberComponent = (props) => {
 					style={{ color: theme.palette.primary.main, textAlign: "center" }}
 				/>
 				<CardContent>
-					<List style={{ color: theme.palette.error.main }}>
+					<List style={{ color: theme.palette.secondary.main }}>
 						{state.teamArray.map((name, index) => {
 							return (
 								<div key={index}>
-									<ListItem>
+									<ListItem style={{ textAlign: "center" }}>
 										<ListItemText primary={name} />
 									</ListItem>
 									<Divider />

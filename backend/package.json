@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Amber Rose",
+  "author": "The 13th Division (Gavin Guerette, Ryan McCormick, Amber Rose)",
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^8.2.0",

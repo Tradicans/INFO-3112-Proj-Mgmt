@@ -20,9 +20,6 @@ const HomeComponent = () => {
 							width={"30%"}
 						/>
 					</div>
-					<div>
-						<h3>Sprint Compass</h3>
-					</div>
 				</CardContent>
 			</Card>
 		</ThemeProvider>

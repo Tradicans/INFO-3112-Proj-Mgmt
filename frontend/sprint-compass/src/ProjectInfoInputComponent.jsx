@@ -10,6 +10,7 @@ import {
 import theme from "./theme";
 import "./App.css";
 import HomeComponent from "./HomeComponent";
+import queryFunction from "./queryfunction";
 
 const ProjectInfoInputComponent = (props) => {
 	//props to be used to send info to other components as needed
@@ -24,32 +25,24 @@ const ProjectInfoInputComponent = (props) => {
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
 	const onAddClicked = async () => {
-		try {
-			//code to send info to db here
-			//
-			//
-			//
-			//reset text entry fields
-			setState({
-				teamName: "",
-				productName: "",
-				startDate: "",
-				hoursPerStoryPt: "",
-				storyPtEst: "",
-				costEst: "",
-			});
-		} catch (error) {
-			//code for error message to user here - use snackbox?
-			//reset text entry fields
-			setState({
-				teamName: "",
-				productName: "",
-				startDate: "",
-				hoursPerStoryPt: "",
-				storyPtEst: "",
-				costEst: "",
-			});
-		}
+		//code to send info to db here
+		//todo: add empty values for missing properties to complete schema
+		//todo: test query functionality
+		//todo: add conversions for non-string values
+		let query = JSON.stringify({
+			query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
+	   { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,
+		});
+		await queryFunction(query);
+		//reset text entry fields
+		setState({
+			teamName: "",
+			productName: "",
+			startDate: "",
+			hoursPerStoryPt: "",
+			storyPtEst: "",
+			costEst: "",
+		});
 	};
 	const handleTeamNameInput = (e) => {
 		setState({ teamName: e.target.value });
@@ -73,11 +66,15 @@ const ProjectInfoInputComponent = (props) => {
 		state.teamName === undefined ||
 		state.teamName === "" ||
 		state.productName === undefined ||
-		state.productName === "";
-	state.startDate === undefined || state.startDate === "";
-	state.hoursPerStoryPt === undefined || state.hoursPerStoryPt === "";
-	state.storyPtEst === undefined || state.storyPtEst === "";
-	state.costEst === undefined || state.costEst === "";
+		state.productName === "" ||
+		state.startDate === undefined ||
+		state.startDate === "" ||
+		state.hoursPerStoryPt === undefined ||
+		state.hoursPerStoryPt === "" ||
+		state.storyPtEst === undefined ||
+		state.storyPtEst === "" ||
+		state.costEst === undefined ||
+		state.costEst === "";
 	return (
 		<ThemeProvider theme={theme}>
 			<Card className="card">
@@ -89,14 +86,14 @@ const ProjectInfoInputComponent = (props) => {
 				<CardContent>
 					<div>
 						<TextField
-							style={{ margin: "1vw" }}
+							style={{ margin: "1%", width: "48%" }}
 							onChange={handleTeamNameInput}
 							placeholder="Team Name"
 							value={state.teamName}
 						/>
 
 						<TextField
-							style={{ margin: "1vw" }}
+							style={{ margin: "1%", width: "48%" }}
 							onChange={handleProdNameInput}
 							placeholder="Product Name"
 							value={state.productName}
@@ -104,14 +101,14 @@ const ProjectInfoInputComponent = (props) => {
 					</div>
 					<div>
 						<TextField
-							style={{ margin: "1vw" }}
+							style={{ margin: "1%", width: "48%" }}
 							onChange={handleStartDateInput}
 							placeholder="Project Start Date"
 							value={state.startDate}
 						/>
 
 						<TextField
-							style={{ margin: "1vw" }}
+							style={{ margin: "1%", width: "48%" }}
 							onChange={handleHoursPerSTInput}
 							placeholder="#Hours/Story Point"
 							value={state.hoursPerStoryPt}
@@ -119,14 +116,14 @@ const ProjectInfoInputComponent = (props) => {
 					</div>
 					<div>
 						<TextField
-							style={{ margin: "1vw" }}
+							style={{ margin: "1%", width: "48%" }}
 							onChange={handleSPEstInput}
 							placeholder="Total Story Point Estimate"
 							value={state.storyPtEst}
 						/>
 
 						<TextField
-							style={{ margin: "1vw" }}
+							style={{ margin: "1%", width: "48%" }}
 							onChange={handleCostEstInput}
 							placeholder="Total Cost Estimate"
 							value={state.costEst}
