@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
@@ -21,6 +21,21 @@ import TeamMemberComponent from "./TeamMemberComponent";
 import BacklogComponent from "./BacklogComponent";
 
 const App = () => {
+	const initialState = {
+		showMsg: false,
+		snackBarMsg: "",
+	};
+	const reducer = (state, newState) => ({ ...state, ...newState });
+	const [state, setState] = useReducer(reducer, initialState);
+	const snackbarClose = (event, reason) => {
+		if (reason === "clickaway") {
+			return;
+		}
+		setState({ showMsg: false });
+	};
+	const msgFromChild = (msg) => {
+		setState({ snackBarMsg: msg, showMsg: true });
+	};
 	const [anchorEl, setAnchorEl] = useState(null);
 	const handleClose = () => {
 		setAnchorEl(null);
@@ -67,10 +82,27 @@ const App = () => {
 			<Routes>
 				<Route path="/" element={<HomeComponent />} />
 				<Route path="/home" element={<HomeComponent />} />
-				<Route path="/infoinput" element={<ProjectInfoInputComponent />} />
-				<Route path="/team" element={<TeamMemberComponent />} />
-				<Route path="/backlog" element={<BacklogComponent />} />
+				<Route
+					path="/infoinput"
+					element={
+						<ProjectInfoInputComponent dataFromProjInfo={msgFromChild} />
+					}
+				/>
+				<Route
+					path="/team"
+					element={<TeamMemberComponent dataFromTeam={msgFromChild} />}
+				/>
+				<Route
+					path="/backlog"
+					element={<BacklogComponent dataFromBacklog={msgFromChild} />}
+				/>
 			</Routes>
+			<Snackbar
+				open={state.showMsg}
+				message={state.snackBarMsg}
+				autoHideDuration={3000}
+				onClose={snackbarClose}
+			/>
 		</ThemeProvider>
 	);
 };

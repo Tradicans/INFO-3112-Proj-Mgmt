@@ -30,22 +30,29 @@ const TeamMemberComponent = (props) => {
 
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
+	const sendSnack = (msg) => {
+		props.dataFromTeam(msg);
+	};
 	//todo: uncomment when query can be used
-	// useEffect(() => {
-	// 	readTeamArray();
-	// }, []);
+	useEffect(() => {
+		readTeamArray();
+	}, []);
 	const readTeamArray = async () => {
 		//load existing array if exists
 		let query = JSON.stringify({
 			query: `query {products{teammembers}}`,
 		});
-		let json = await queryFunction(query);
-		//todo: check this returns just the team array of names as expected
-		setState({ teamArray: json.data.products.teammembers });
-		//todo: error handling if needed if query returns null, still need page to load
+		try {
+			let json = await queryFunction(query);
+			//todo: check this returns just the team array of names as expected
+			setState({ teamArray: json.data.products.teammembers });
+		} catch (error) {
+			sendSnack(`Problem loading server data - ${error.message}`);
+		}
 	};
 	const onCancelClicked = () => {
 		closeModal();
+		setState({ newName: "" });
 	};
 	const onAddClicked = async () => {
 		//todo: code to add team member to db
@@ -53,7 +60,14 @@ const TeamMemberComponent = (props) => {
 		let query = JSON.stringify({
 			query: ``,
 		});
-		let json = await queryFunction(query);
+		try {
+			let json = await queryFunction(query);
+			sendSnack(
+				`${state.newName} added to ${json.data.product.productname} team`
+			);
+		} catch (error) {
+			sendSnack(`Problem adding team member - ${error.message}`);
+		}
 		//reset name
 		setState({ newName: "" });
 		closeModal();

@@ -24,6 +24,9 @@ const ProjectInfoInputComponent = (props) => {
 	};
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
+	const sendSnack = (msg) => {
+		props.dataFromProjInfo(msg);
+	};
 	const onAddClicked = async () => {
 		//code to send info to db here
 		//todo: add empty values for missing properties to complete schema
@@ -33,7 +36,12 @@ const ProjectInfoInputComponent = (props) => {
 			query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
 	   { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,
 		});
-		await queryFunction(query);
+		try {
+			let json = await queryFunction(query);
+			sendSnack(`${json.data.addproduct.productName} added`);
+		} catch (error) {
+			sendSnack(`Problem adding project - ${error.message}`);
+		}
 		//reset text entry fields
 		setState({
 			teamName: "",

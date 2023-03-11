@@ -15,6 +15,8 @@ const queryFunction = async (queryString) => {
 		});
 		let json = await response.json();
 		return json;
-	} catch {}
+	} catch (error) {
+		return error;
+	}
 };
 export default queryFunction;
