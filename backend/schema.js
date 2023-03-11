@@ -7,7 +7,7 @@ type Query {
 
     sprints: [Sprint],
 
-    product: [Product],
+    products: [Product],
 
     stories: [Story],
 
@@ -42,6 +42,8 @@ type User {
 type Product {
 
     productname: String
+
+    teamname: String
 
     startdate: String
 
@@ -118,7 +120,7 @@ type Task {
 
 type Mutation {
 
-    addproduct(productname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, iscompleted: String): Product,
+    addproduct(productname: String, teamname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, iscompleted: String): Product,
 
     adduser(name: String, role: String): User,
 

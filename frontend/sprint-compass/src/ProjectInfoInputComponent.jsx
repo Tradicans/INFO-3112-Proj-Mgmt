@@ -17,17 +17,32 @@ const ProjectInfoInputComponent = (props) => {
 		teamName: "",
 		productName: "",
 		startDate: "",
-		hoursPerStoryPt: "",
+		hoursPerStoryPt: 0,
 		storyPtEst: "",
 		costEst: "",
 	};
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
 	const onAddClicked = async () => {
+		//code to send info to db here
+		let myHeaders = new Headers();
+		myHeaders.append("Content-Type", "application/json");
 		try {
-			//code to send info to db here
-			//
-			//
+			//    addproduct(productname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, iscompleted: String): Product,
+
+			let query = JSON.stringify({
+				query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
+           { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,
+			});
+			console.log(query);
+			let response = await fetch("http://localhost:5000/graphql", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json; charset=utf-8",
+				},
+				body: query,
+			});
+			let json = await response.json();
 			//
 			//reset text entry fields
 			setState({
