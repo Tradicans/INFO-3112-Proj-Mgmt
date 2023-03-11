@@ -17,6 +17,7 @@ import AddCircle from "@mui/icons-material/AddCircle";
 import theme from "./theme";
 import "./App.css";
 import HomeComponent from "./HomeComponent";
+import queryFunction from "./queryfunction";
 
 const TeamMemberComponent = (props) => {
 	const initialState = {
@@ -26,14 +27,31 @@ const TeamMemberComponent = (props) => {
 		showAddCard: false,
 		newName: "",
 	};
+
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
+	//todo: uncomment when query can be used
+	// useEffect(() => {
+	// 	readTeamArray();
+	// }, []);
+	const readTeamArray = async () => {
+		//load existing array if exists
+		let query = JSON.stringify({
+			query: `query {products{teammembers}}`,
+		});
+		let json = await queryFunction(query);
+		setState({ teamArray: json.data.products.teammembers });
+	};
 	const onCancelClicked = () => {
 		closeModal();
 	};
 	const onAddClicked = async () => {
 		//todo: code to add team member to db
-		//
+		//need to pull existing array with one query, add teammember, then a second query to return modified array?
+		let query = JSON.stringify({
+			query: ``,
+		});
+		let json = await queryFunction(query);
 		//reset name
 		setState({ newName: "" });
 		closeModal();

@@ -18,7 +18,7 @@ const ProjectInfoInputComponent = (props) => {
 		teamName: "",
 		productName: "",
 		startDate: "",
-		hoursPerStoryPt: 0,
+		hoursPerStoryPt: "",
 		storyPtEst: "",
 		costEst: "",
 	};
@@ -30,7 +30,7 @@ const ProjectInfoInputComponent = (props) => {
 			query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
 	   { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,
 		});
-		queryFunction(query);
+		let json = await queryFunction(query);
 		//reset text entry fields
 		setState({
 			teamName: "",
