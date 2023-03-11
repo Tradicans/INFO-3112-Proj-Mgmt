@@ -10,6 +10,7 @@ import {
 import theme from "./theme";
 import "./App.css";
 import HomeComponent from "./HomeComponent";
+import queryFunction from "./queryfunction";
 
 const ProjectInfoInputComponent = (props) => {
 	//props to be used to send info to other components as needed
@@ -25,46 +26,20 @@ const ProjectInfoInputComponent = (props) => {
 	const [state, setState] = useReducer(reducer, initialState);
 	const onAddClicked = async () => {
 		//code to send info to db here
-		let myHeaders = new Headers();
-		myHeaders.append("Content-Type", "application/json");
-		try {
-			//    addproduct(productname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, iscompleted: String): Product,
-
-			let query = JSON.stringify({
-				query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
-           { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,
-			});
-			console.log(query);
-			let response = await fetch("http://localhost:5000/graphql", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json; charset=utf-8",
-				},
-				body: query,
-			});
-			let json = await response.json();
-			//
-			//reset text entry fields
-			setState({
-				teamName: "",
-				productName: "",
-				startDate: "",
-				hoursPerStoryPt: "",
-				storyPtEst: "",
-				costEst: "",
-			});
-		} catch (error) {
-			//code for error message to user here - use snackbox?
-			//reset text entry fields
-			setState({
-				teamName: "",
-				productName: "",
-				startDate: "",
-				hoursPerStoryPt: "",
-				storyPtEst: "",
-				costEst: "",
-			});
-		}
+		let query = JSON.stringify({
+			query: `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: "${state.hoursPerStoryPt}", estimatestorypoints: "${state.storyPtEst}", estimatetotalcost: "${state.costEst}" ) 
+	   { productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`,
+		});
+		queryFunction(query);
+		//reset text entry fields
+		setState({
+			teamName: "",
+			productName: "",
+			startDate: "",
+			hoursPerStoryPt: "",
+			storyPtEst: "",
+			costEst: "",
+		});
 	};
 	const handleTeamNameInput = (e) => {
 		setState({ teamName: e.target.value });
