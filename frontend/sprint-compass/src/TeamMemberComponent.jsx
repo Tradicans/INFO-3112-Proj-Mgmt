@@ -40,7 +40,9 @@ const TeamMemberComponent = (props) => {
 			query: `query {products{teammembers}}`,
 		});
 		let json = await queryFunction(query);
+		//todo: check this returns just the team array of names as expected
 		setState({ teamArray: json.data.products.teammembers });
+		//todo: error handling if needed if query returns null, still need page to load
 	};
 	const onCancelClicked = () => {
 		closeModal();
@@ -79,7 +81,7 @@ const TeamMemberComponent = (props) => {
 						<CardContent>
 							<div style={{ textAlign: "center" }}>
 								<TextField
-									style={{ margin: "1vw" }}
+									style={{ margin: "1vw", width: "52vw" }}
 									onChange={handleNewNameInput}
 									placeholder="Team Member Name"
 									value={state.newName}
@@ -87,6 +89,7 @@ const TeamMemberComponent = (props) => {
 							</div>
 							<div style={{ textAlign: "center" }}>
 								<Button
+									style={{ margin: "1vw", width: "25vw" }}
 									color="secondary"
 									variant="contained"
 									onClick={onCancelClicked}
@@ -94,6 +97,7 @@ const TeamMemberComponent = (props) => {
 									Cancel
 								</Button>
 								<Button
+									style={{ margin: "1vw", width: "25vw" }}
 									color="secondary"
 									variant="contained"
 									onClick={onAddClicked}
@@ -110,11 +114,11 @@ const TeamMemberComponent = (props) => {
 					style={{ color: theme.palette.primary.main, textAlign: "center" }}
 				/>
 				<CardContent>
-					<List style={{ color: theme.palette.error.main }}>
+					<List style={{ color: theme.palette.secondary.main }}>
 						{state.teamArray.map((name, index) => {
 							return (
 								<div key={index}>
-									<ListItem>
+									<ListItem style={{ textAlign: "center" }}>
 										<ListItemText primary={name} />
 									</ListItem>
 									<Divider />

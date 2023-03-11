@@ -1,7 +1,3 @@
-import React, { useReducer } from "react";
-import theme from "./theme";
-import "./App.css";
-
 const queryFunction = async (queryString) => {
 	let myHeaders = new Headers();
 	myHeaders.append("Content-Type", "application/json");

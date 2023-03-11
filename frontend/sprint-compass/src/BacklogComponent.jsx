@@ -45,8 +45,10 @@ const BacklogComponent = (props) => {
 		let query = JSON.stringify({
 			query: `query {stories{}}`,
 		});
+		//todo: test this returns array of stories as expected
 		let json = await queryFunction(query);
 		setState({ storiesArray: json.data.stories });
+		//todo: error handling if needed if array returns null, still need page to load
 	};
 	const onCancelClicked = () => {
 		closeModal();
@@ -60,8 +62,7 @@ const BacklogComponent = (props) => {
             {storyname, storydescription, sprintid, productid, storypoints, costperhour, iscompleted},
             }`,
 		});
-		//todo: use json to ensure this line runs
-		let json = await queryFunction(query);
+		await queryFunction(query);
 		//reset state
 		setState({
 			storyName: "",
@@ -98,6 +99,8 @@ const BacklogComponent = (props) => {
 		setState({ costPerHr: e.target.value });
 	};
 
+	//todo: set up table rather than list for card content
+	//use code similar to AR JS case1 advisory list?
 	return (
 		<ThemeProvider theme={theme}>
 			<Card className="card">
@@ -111,13 +114,13 @@ const BacklogComponent = (props) => {
 						<CardContent>
 							<div style={{ textAlign: "center" }}>
 								<TextField
-									style={{ margin: "1vw", width: "46vw" }}
+									style={{ margin: "1%", width: "48%" }}
 									onChange={handleStoryNameInput}
 									placeholder="Story Name"
 									value={state.storyName}
 								/>
 								<TextField
-									style={{ margin: "1vw", width: "45vw" }}
+									style={{ margin: "1%", width: "48%" }}
 									onChange={handlePriorityInput}
 									placeholder="Priority"
 									value={state.priority}
@@ -125,8 +128,7 @@ const BacklogComponent = (props) => {
 							</div>
 							<div style={{ textAlign: "center" }}>
 								<TextField
-									fullWidth
-									style={{ margin: "1vw" }}
+									style={{ margin: "1%", width: "98%" }}
 									onChange={handleDescriptionInput}
 									placeholder="Description: I want to...."
 									value={state.storyDescription}
@@ -134,13 +136,13 @@ const BacklogComponent = (props) => {
 							</div>
 							<div style={{ textAlign: "center" }}>
 								<TextField
-									style={{ margin: "1vw", width: "46vw" }}
+									style={{ margin: "1%", width: "48%" }}
 									onChange={handleStoryPtsInput}
 									placeholder="Estimated # Story Points"
 									value={state.storyPts}
 								/>
 								<TextField
-									style={{ margin: "1vw", width: "45vw" }}
+									style={{ margin: "1%", width: "48%" }}
 									onChange={handleCostInput}
 									placeholder="Estimated Cost/Hour"
 									value={state.costPerHr}
@@ -148,6 +150,7 @@ const BacklogComponent = (props) => {
 							</div>
 							<div style={{ textAlign: "center" }}>
 								<Button
+									style={{ margin: "1%", width: "25%" }}
 									color="secondary"
 									variant="contained"
 									onClick={onCancelClicked}
@@ -155,6 +158,7 @@ const BacklogComponent = (props) => {
 									Cancel
 								</Button>
 								<Button
+									style={{ margin: "1%", width: "25%" }}
 									color="secondary"
 									variant="contained"
 									onClick={onAddClicked}
