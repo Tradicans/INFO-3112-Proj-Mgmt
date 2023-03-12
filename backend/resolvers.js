@@ -53,13 +53,14 @@ const resolvers = {
       estimatetotalcost: args.estimatetotalcost,
       iscompleted: args.iscompleted,
     };
-
-    return await rtn.addOne(db, cfg.productColl, product);
+    let results = await rtn.addOne(db, cfg.productColl, product);
+    return results.acknowledged ? product : null;
   },
   adduser: async (args) => {
     let db = await rtn.getDBInstance();
     let user = { name: args.name, role: args.role };
-    return await rtn.addOne(db, cfg.userColl, user);
+    let results = await rtn.addOne(db, cfg.userColl, user);
+    return results.acknowledged ? user : null;
   },
   addsprint: async (args) => {
     let db = await rtn.getDBInstance();
@@ -71,18 +72,36 @@ const resolvers = {
       iscompleted: args.iscompleted,
       stories: args.stories,
     };
-
-    return await rtn.addOne(db, cfg.sprintColl, sprint);
+    let results = await rtn.addOne(db, cfg.sprintColl, sprint);
+    return results.acknowledged ? sprint : null;
   },
-  /*
-  type Mutation {
-
-    addstory(storyname: String, storydescription: String, sprintid: String, productid: String, storypoints: Int, costperhour: Float, iscompleted: String): Story,
-
-    addtask(taskname: String, storyid: String, sprintid: String, productid: String, taskdetails: String, teammembers: [String], hourscompleted: Int, iscompleted: String): Task
-
-}
-  */
+  addstory: async (args) => {
+    let db = await rtn.getDBInstance();
+    let story = {
+      storyname: args.storyname,
+      storydescription: args.storydescription,
+      sprints: args.sprints,
+      storypoints: args.storypoints,
+      costperhour: args.costperhour,
+      priority: args.priority,
+      tasks: args.tasks,
+    };
+    let results = await rtn.addOne(db, cfg.storyColl, story);
+    return results.acknowledged ? story : null;
+  },
+  addtask: async (args) => {
+    let db = await rtn.getDBInstance();
+    let task = {
+      taskname: args.storyname,
+      storyid: args.storydescription,
+      taskdetails: args.sprints,
+      teammember: args.storypoints,
+      hourscompleted: args.costperhour,
+      iscompleted: args.iscompleted,
+    };
+    let results = await rtn.addOne(db, cfg.storyColl, task);
+    return results.acknowledged ? task : null;
+  },
 };
 
 export default resolvers;

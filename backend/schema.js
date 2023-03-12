@@ -55,7 +55,8 @@ type Story {
     storydescription: String
     sprints: [String]
     storypoints: Int
-    costperhour: Double
+    costperhour: Float
+    priority: Int
     tasks: [String]
 },
 
@@ -69,14 +70,11 @@ type Task {
 },
 
 type Mutation {
-    estimatestorypoints: Int
-    estimatetotalcost: String
-    sprints: [String]
-    addproduct(productname: String, teamname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, iscompleted: String): Product,
+    addproduct(productname: String, teamname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: Int, sprints: [String]): Product,
     adduser(name: String, role: String): User,
-    addsprint(productid: String, sprintname: String, teammembers: [String], startdate: String, enddate: String, iscompleted: String): Sprint,
-    addstory(storyname: String, storydescription: String, sprintid: String, productid: String, storypoints: Int, costperhour: Float, iscompleted: String): Story,
-    addtask(taskname: String, storyid: String, sprintid: String, productid: String, taskdetails: String, teammembers: [String], hourscompleted: Int, iscompleted: String): Task
+    addsprint(productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
+    addstory(storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, tasks: [String]): Story,
+    addtask(taskname: String, storyid: String, taskdetails: String, hourscompleted: Int, iscompleted: Boolean): Task
 },
 `;
 export default schema;
