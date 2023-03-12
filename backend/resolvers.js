@@ -1,6 +1,5 @@
 import * as rtn from "./db_routines.js";
 import * as cfg from "./config.js";
-import { ObjectId } from "mongodb";
 
 const resolvers = {
   //Queries
@@ -29,13 +28,35 @@ const resolvers = {
     return await rtn.findAll(db, cfg.storyColl, {}, {});
   },
 
-  sprintsbyproject: async (projectId) => {
+  sprintsbyproduct: async (args) => {
     let db = await rtn.getDBInstance();
     return await rtn.findAll(
       db,
       cfg.sprintColl,
-      { _id: ObjectId(projectId) },
+      { productid: args.productid },
       {}
+    );
+  },
+  storiesbysprint: async (args) => {
+    let db = await rtn.getDBInstance();
+    return await rtn.findAll(
+      db,
+      cfg.storyColl,
+      {},
+      { sprints: { $elemMatch: { String: args.sprintid } } }
+    );
+  },
+  tasksbystory: async (args) => {
+    let db = await rtn.getDBInstance();
+    return await rtn.findAll(db, cfg.taskColl, { storyid: args.storyid }, {});
+  },
+  usersbyproduct: async (args) => {
+    let db = await rtn.getDBInstance();
+    return await rtn.findAll(
+      db,
+      cfg.userColl,
+      {},
+      { products: { $elemMatch: { String: args.productid } } }
     );
   },
   //Mutations
@@ -51,7 +72,7 @@ const resolvers = {
       hoursperstorypoint: args.hoursperstorypoint,
       estimatestorypoints: args.estimatestorypoints,
       estimatetotalcost: args.estimatetotalcost,
-      iscompleted: args.iscompleted,
+      sprints: args.sprints,
     };
     let results = await rtn.addOne(db, cfg.productColl, product);
     return results.acknowledged ? product : null;
@@ -92,14 +113,14 @@ const resolvers = {
   addtask: async (args) => {
     let db = await rtn.getDBInstance();
     let task = {
-      taskname: args.storyname,
-      storyid: args.storydescription,
-      taskdetails: args.sprints,
-      teammember: args.storypoints,
-      hourscompleted: args.costperhour,
+      taskname: args.taskname,
+      storyid: args.storyid,
+      taskdetails: args.taskdetails,
+      teammember: args.teammember,
+      hourscompleted: args.hourscompleted,
       iscompleted: args.iscompleted,
     };
-    let results = await rtn.addOne(db, cfg.storyColl, task);
+    let results = await rtn.addOne(db, cfg.taskColl, task);
     return results.acknowledged ? task : null;
   },
 };

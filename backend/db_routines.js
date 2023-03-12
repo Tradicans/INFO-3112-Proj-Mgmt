@@ -25,7 +25,7 @@ const deleteAll = (db, coll) => db.collection(coll).deleteMany({});
 const addMany = (db, coll, docs) => db.collection(coll).insertMany(docs);
 const findOne = (db, coll, criteria) => db.collection(coll).findOne(criteria);
 const findAll = (db, coll, criteria, projection) =>
-  db.collection(coll).find(criteria).project(projection).toArray();
+  db.collection(coll).find(criteria, projection).toArray();
 const updateOne = (db, coll, criteria, projection) =>
   db
     .collection(coll)
