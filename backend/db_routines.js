@@ -1,21 +1,19 @@
 import { MongoClient } from "mongodb";
 import * as cfg from "./config.js";
-import got from "got";
+//import got from "got";
 
 let db;
 const getDBInstance = async () => {
   if (db) {
-    console.log("using established connection");
+    console.log(`using established connection`);
     return db;
   }
+  let MongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
   try {
-    const client = new MongoClient(cfg.atlas, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("establishing new connection to Atlas");
+    const client = new MongoClient(cfg.dbUrl, MongoOptions);
+    console.log(`establishing new connection to Atlas.`);
     const conn = await client.connect();
-    db = conn.db(cfg.appdb);
+    db = conn.db(cfg.db);
   } catch (err) {
     console.log(err);
   }
@@ -27,14 +25,14 @@ const deleteAll = (db, coll) => db.collection(coll).deleteMany({});
 const addMany = (db, coll, docs) => db.collection(coll).insertMany(docs);
 const findOne = (db, coll, criteria) => db.collection(coll).findOne(criteria);
 const findAll = (db, coll, criteria, projection) =>
-  db.collection(coll).find(criteria).project(projection).toArray();
+  db.collection(coll).find(criteria, projection).toArray();
 const updateOne = (db, coll, criteria, projection) =>
   db
     .collection(coll)
     .findOneAndUpdate(criteria, { $set: projection }, { rawResult: true });
 const deleteOne = (db, coll, criteria) =>
   db.collection(coll).deleteOne(criteria);
-const getJSONFromWWWPromise = (url) => got(url).json();
+//const getJSONFromWWWPromise = (url) => got(url).json(); //For now we don't have/need got dependencies.
 const findUniqueValues = (db, coll, field) =>
   db.collection(coll).distinct(field);
 
@@ -48,6 +46,6 @@ export {
   findAll,
   updateOne,
   deleteOne,
-  getJSONFromWWWPromise,
+  //getJSONFromWWWPromise,
   findUniqueValues,
 };
