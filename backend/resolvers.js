@@ -54,9 +54,9 @@ const resolvers = {
     let db = await rtn.getDBInstance();
     return await rtn.findAll(
       db,
-      cfg.userColl,
-      {},
-      { products: { $elemMatch: { String: args.productid } } }
+      cfg.productColl,
+      { products: { $elemMatch: { String: args.productid } } },
+      {}
     );
   },
   //Mutations
