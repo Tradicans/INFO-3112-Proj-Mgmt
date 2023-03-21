@@ -54,7 +54,7 @@ const resolvers = {
     let db = await rtn.getDBInstance();
     return await rtn.findAll(
       db,
-      cfg.productColl,
+      cfg.userColl,
       {},
       { products: { $elemMatch: { String: args.productid } } }
     );
