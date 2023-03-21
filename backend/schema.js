@@ -42,6 +42,7 @@ type Query {
     storiesbysprint(sprintid: String): [Story]
     tasksbystory(storyid: String): [Task]
     usersbyproduct(productid: String): [User]
+    productsbyuser(userid: String) : [Product]
     project_setup: [String]
 },
 
@@ -102,7 +103,15 @@ type Mutation {
     adduser(name: String, role: String): User,
     addsprint(productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
     addstory(storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
-    addtask(taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task
+    addtask(taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
+    updateuser(_id: String, name: String, role: String): User,
+    updatetask(_id: String, taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
+    updatestory(_id: String, storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
+    updateproduct(_id: String, productname: String, teamname: String, startdate: String, enddate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, sprints: [String]): Product,
+    updatesprint(_id: String, productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
 },
 `;
+/*
+ * deletes [User, Task, Story, Product, Sprint] for all base object
+ */
 export default schema;
