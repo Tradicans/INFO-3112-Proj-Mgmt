@@ -104,7 +104,7 @@ type Mutation {
     addsprint(productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
     addstory(storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
     addtask(taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
-    updateuser(_id: String, name: String, role: String): User,
+    updateuser(_id: String, name: String, role: String, products: [String]): User,
     updatetask(_id: String, taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
     updatestory(_id: String, storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
     updateproduct(_id: String, productname: String, teamname: String, startdate: String, enddate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, sprints: [String]): Product,
