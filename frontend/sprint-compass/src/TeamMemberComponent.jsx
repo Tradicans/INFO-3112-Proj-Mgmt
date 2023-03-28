@@ -79,8 +79,8 @@ const TeamMemberComponent = (props) => {
     let query = `mutation{adduser(name:"${state.newName}",role:"${state.newRole}"){_id, name, role}}`;
     let json = await queryFunction(query);
     //reset name
-    state.selectedProduct.teammembers.push(json.data.adduser._id);
-    let updateQuery = `mutation{updateproduct(_id: "${state.selectedProduct._id}", productname: "${state.selectedProduct.productname}", teamname: "${state.selectedProduct.teamname}", startdate: "${state.selectedProduct.startdate}", enddate: "${state.selectedProduct.enddate}", productowner: "${state.selectedProduct.productowner}", teammembers: ${state.selectedProduct.teammembers}, hoursperstorypoint: ${state.selectedProduct.hoursperstorypoint}, estimatestorypoints: ${state.selectedProduct.estimatestorypoints}, estimatetotalcost: "${state.selectedProduct.estimatetotalcost}", sprints: ${state.selectedProduct.sprints})}`;
+    //state.selectedProduct.teammembers.push(json.data.adduser._id);
+    let updateQuery = `mutation{updateuser(_id:"${json.data.adduser._id}", name:"${state.newName}", role: "${state.newRole}", products: "${state.selectedProduct._id}") {_id, name, role}}`;
     let secondJson = await queryFunction(updateQuery);
     if (secondJson !== null) {
       setState({ newName: "", newRole: "" });
