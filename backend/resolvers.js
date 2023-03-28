@@ -1,5 +1,6 @@
 import * as rtn from "./db_routines.js";
 import * as cfg from "./config.js";
+import { ObjectId } from "mongodb";
 
 const resolvers = {
   //Queries
@@ -39,12 +40,7 @@ const resolvers = {
   },
   storiesbysprint: async (args) => {
     let db = await rtn.getDBInstance();
-    return await rtn.findAll(
-      db,
-      cfg.storyColl,
-      {},
-      { sprints: { $elemMatch: { String: args.sprintid } } }
-    );
+    return await rtn.findAll(db, cfg.storyColl, {}, { sprints: args.sprintid });
   },
   tasksbystory: async (args) => {
     let db = await rtn.getDBInstance();
@@ -55,8 +51,8 @@ const resolvers = {
     return await rtn.findAll(
       db,
       cfg.userColl,
-      {},
-      { products: { $elemMatch: { String: args.productid } } }
+      { products: args.productid },
+      {}
     );
   },
   //Mutations
@@ -79,7 +75,7 @@ const resolvers = {
   },
   adduser: async (args) => {
     let db = await rtn.getDBInstance();
-    let user = { name: args.name, role: args.role };
+    let user = { name: args.name, role: args.role, products: [""] };
     let results = await rtn.addOne(db, cfg.userColl, user);
     return results.acknowledged ? user : null;
   },
@@ -129,8 +125,22 @@ const resolvers = {
       db,
       cfg.userColl,
       { _id: new rtn.ObjectId(args._id) },
-      { name: args.name, role: args.role }
+      { name: args.name, role: args.role, products: args.products }
     );
+    if (args.products[0]?.length != 0)
+      for (let i = 0; i < args.products.length; i++) {
+        let product = await rtn.findOne(db, cfg.productColl, {
+          _id: new ObjectId(args.products[i]),
+        });
+        if (product.teammembers[0]?.length != 0)
+          if (!product.teammembers.includes(args._id)) {
+            product.teammembers.push(args._id);
+          } else {
+          }
+        else product.teammembers[0] = args._id;
+        internalProductUpdate(product);
+      }
+
     return results.value !== null
       ? args
       : {
@@ -236,6 +246,10 @@ const resolvers = {
           sprintname: "No sprint updated",
         };
   },
+};
+
+let internalProductUpdate = async (args) => {
+  await resolvers.updateproduct(args);
 };
 
 export default resolvers;
