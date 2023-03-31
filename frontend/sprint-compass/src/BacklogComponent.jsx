@@ -36,34 +36,27 @@ const BacklogComponent = (props) => {
 
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
+	const sendSnack = (msg) => {
+		props.dataFromBacklog(msg);
+	};
 	//todo: uncomment when query can be used
-	// useEffect(() => {
-	// 	readStoriesArray();
-	// }, []);
+	useEffect(() => {
+		readStoriesArray();
+	}, []);
 	const readStoriesArray = async () => {
 		//load existing array if exists
 		let query = JSON.stringify({
 			query: `query {stories{}}`,
 		});
-		//todo: test this returns array of stories as expected
-		let json = await queryFunction(query);
-		setState({ storiesArray: json.data.stories });
-		//todo: error handling if needed if array returns null, still need page to load
+		try {
+			//todo: test this returns array of stories as expected
+			let json = await queryFunction(query);
+			setState({ storiesArray: json.data.stories });
+		} catch (error) {
+			sendSnack(`Problem loading server data - ${error.message}`);
+		}
 	};
-	const onCancelClicked = () => {
-		closeModal();
-	};
-	const onAddClicked = async () => {
-		// code to add story to db
-		//todo: add priority
-		//todo: change ones not collected from user to preset values
-		let query = JSON.stringify({
-			query: `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprintid: "${state.sprintID}", productid: "${state.productID}", storypoints: "${state.storyPts}", costperhour: "${state.costPerHr}", iscompleted: "${state.isCompleted}") 
-            {storyname, storydescription, sprintid, productid, storypoints, costperhour, iscompleted},
-            }`,
-		});
-		await queryFunction(query);
-		//reset state
+	const resetState = () => {
 		setState({
 			storyName: "",
 			storyDescription: "",
@@ -76,6 +69,27 @@ const BacklogComponent = (props) => {
 			isCompleted: "",
 		});
 		closeModal();
+	};
+	const onCancelClicked = () => {
+		resetState();
+	};
+	const onAddClicked = async () => {
+		// code to add story to db
+		//todo: add priority
+		//todo: change ones not collected from user to preset values
+		let query = JSON.stringify({
+			query: `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprintid: "${state.sprintID}", productid: "${state.productID}", storypoints: "${state.storyPts}", costperhour: "${state.costPerHr}", iscompleted: "${state.isCompleted}") 
+            {storyname, storydescription, sprintid, productid, storypoints, costperhour, iscompleted},
+            }`,
+		});
+		try {
+			let json = await queryFunction(query);
+			sendSnack(`${json.data.addstory.storyName} added`);
+		} catch (error) {
+			sendSnack(`Problem adding story - ${error.message}`);
+		}
+
+		resetState();
 	};
 	const showModal = () => {
 		setState({ showAddCard: true });
