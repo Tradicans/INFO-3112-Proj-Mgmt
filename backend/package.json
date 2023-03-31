@@ -1,11 +1,20 @@
 {
   "name": "backend",
   "version": "1.0.0",
+  "type": "module",
   "description": "backend for sprint compass",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "The 13th Division (Gavin Guerette, Ryan McCormick, Amber Rose)",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cors": "^8.2.0",
+    "dotenv": "^16.0.3",
+    "fastify": "^4.14.1",
+    "graphql": "^16.6.0",
+    "mercurius": "^12.2.0",
+    "mongodb": "^5.1.0"
+  }
 }
