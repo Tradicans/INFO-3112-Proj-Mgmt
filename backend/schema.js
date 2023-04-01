@@ -9,6 +9,28 @@
 
 //Stories contain a list of tasks and a task can reference a story. The tasks contain a user
 
+//Users hold a list of products they're working on
+
+//TESTED:
+
+//MUTATIONS~~~~~~~
+//addproduct [check]
+//adduser [check]
+//addstory [check]
+//addsprint [check]
+//addtask [check]
+//QUERY~~~~~~~~~~~
+//users [check]
+//tasks [check]
+//sprints [check]
+//stories [check]
+//products [check]
+//sprintsbyproject(productid: String) [check]
+//storiesbysprint(sprintid: String) [check]
+//tasksbystory(storyid: String) [check]
+//usersbyproject(productid: String) [check]
+//project_setup: [?]
+
 const schema = `
 type Query {
     users: [User]
@@ -16,19 +38,23 @@ type Query {
     sprints: [Sprint]
     products: [Product]
     stories: [Story]
-    sprintsbyproject(productid: String): [Sprint]
+    sprintsbyproduct(productid: String): [Sprint]
     storiesbysprint(sprintid: String): [Story]
     tasksbystory(storyid: String): [Task]
-    usersbyproject(productid: String): [User]
+    usersbyproduct(productid: String): [User]
+    productsbyuser(userid: String) : [Product]
     project_setup: [String]
 },
 
 type User {
+    _id: String
     name: String
     role: String
+    products: [String]
 },
 
 type Product {
+    _id: String
     productname: String
     teamname: String
     startdate: String
@@ -42,6 +68,7 @@ type Product {
 },
 
 type Sprint {
+    _id: String
     productid: String
     sprintname: String
     startdate: String
@@ -51,6 +78,7 @@ type Sprint {
 },
 
 type Story {
+    _id: String
     storyname: String
     storydescription: String
     sprints: [String]
@@ -61,6 +89,7 @@ type Story {
 },
 
 type Task {
+    _id: String
     taskname: String
     storyid: String
     taskdetails: String
@@ -70,11 +99,19 @@ type Task {
 },
 
 type Mutation {
-    addproduct(productname: String, teamname: String, startdate: String, endate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: Int, sprints: [String]): Product,
+    addproduct(productname: String, teamname: String, startdate: String, enddate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: Int, sprints: [String]): Product,
     adduser(name: String, role: String): User,
     addsprint(productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
-    addstory(storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, tasks: [String]): Story,
-    addtask(taskname: String, storyid: String, taskdetails: String, hourscompleted: Int, iscompleted: Boolean): Task
+    addstory(storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
+    addtask(taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
+    updateuser(_id: String, name: String, role: String, products: [String]): User,
+    updatetask(_id: String, taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
+    updatestory(_id: String, storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
+    updateproduct(_id: String, productname: String, teamname: String, startdate: String, enddate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: String, sprints: [String]): Product,
+    updatesprint(_id: String, productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
 },
 `;
+/*
+ * deletes [User, Task, Story, Product, Sprint] for all base object
+ */
 export default schema;

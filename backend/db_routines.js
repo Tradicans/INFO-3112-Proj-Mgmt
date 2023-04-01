@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import * as cfg from "./config.js";
 //import got from "got";
 
@@ -48,4 +48,5 @@ export {
   deleteOne,
   //getJSONFromWWWPromise,
   findUniqueValues,
+  ObjectId,
 };
