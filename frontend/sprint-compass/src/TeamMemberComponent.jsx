@@ -12,6 +12,7 @@ import {
 	ListItem,
 	ListItemText,
 	Divider,
+	Autocomplete,
 } from "@mui/material";
 import AddCircle from "@mui/icons-material/AddCircle";
 import theme from "./theme";
@@ -26,6 +27,9 @@ const TeamMemberComponent = (props) => {
 		// teamArray: [],
 		showAddCard: false,
 		newName: "",
+		selectedProduct: {},
+		productList: [],
+		newRole: "",
 	};
 
 	const reducer = (state, newState) => ({ ...state, ...newState });

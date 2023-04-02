@@ -16,9 +16,9 @@ export default createTheme({
       contrastText: "#fff",
     },
     secondary: {
-      light: "rgba(255, 206, 189, 1)",
-      main: "rgba(255, 147, 107, 1)",
-      dark: "rgba(233, 86, 31, 1)",
+      light: "rgba(238, 187, 169, 1)",
+      main: "rgba(224, 116, 76, 1)",
+      dark: "rgba(196, 77, 33, 1)",
       contrastText: "#fff",
     },
     error: {
