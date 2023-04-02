@@ -19,6 +19,7 @@ import theme from "./theme";
 import "./App.css";
 import HomeComponent from "./HomeComponent";
 import queryFunction from "./queryfunction";
+import TaskTableComponent from "./TaskTableComponent";
 
 const BacklogComponent = (props) => {
 	const initialState = {
@@ -213,6 +214,7 @@ const BacklogComponent = (props) => {
 							/>
 						)}
 					/>
+					<TaskTableComponent />
 				</CardContent>
 				<CardContent>
 					{
