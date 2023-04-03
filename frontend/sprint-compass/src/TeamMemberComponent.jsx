@@ -45,7 +45,12 @@ const TeamMemberComponent = (props) => {
     }
     //setState({ teamArray: [] });
     // Dropdown list of all products uses this. This selects a product from the options available and takes it's product ID and list of current users. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
-    let query = `query {usersbyproduct(productid: "${selectedOption._id}"){name, role}}`;
+    let query = ``;
+    if (selectedOption !== null) {
+      query = `query {usersbyproduct(productid: "${selectedOption._id}"){name, role}}`;
+    } else {
+      query = `query {usersbyproduct(productid: ""){name, role}}`;
+    }
     let json = await queryFunction(query);
     setState({
       selectedProduct: selectedOption,

@@ -40,11 +40,18 @@ const resolvers = {
   },
   storiesbysprint: async (args) => {
     let db = await rtn.getDBInstance();
-    return await rtn.findAll(db, cfg.storyColl, {}, { sprints: args.sprintid });
+    return await rtn.findAll(db, cfg.storyColl, {}, {});
   },
   tasksbystory: async (args) => {
     let db = await rtn.getDBInstance();
-    return await rtn.findAll(db, cfg.taskColl, { storyid: args.storyid }, {});
+    return await rtn.findAll(
+      db,
+      cfg.taskColl,
+      {
+        /*storyid: args.storyid*/
+      },
+      {}
+    );
   },
   usersbyproduct: async (args) => {
     let db = await rtn.getDBInstance();
@@ -222,6 +229,15 @@ const resolvers = {
           productname: "None found",
           teamname: "No product updated",
         };
+  },
+  project_setup: async () => {
+    let db = await rtn.getDBInstance();
+    await rtn.deleteAll(db, cfg.productColl, {}, {});
+    await rtn.deleteAll(db, cfg.sprintColl, {}, {});
+    await rtn.deleteAll(db, cfg.storyColl, {}, {});
+    await rtn.deleteAll(db, cfg.userColl, {}, {});
+    await rtn.deleteAll(db, cfg.taskColl, {}, {});
+    return "all tables have been dropped.";
   },
   updatesprint: async (args) => {
     let db = await rtn.getDBInstance();

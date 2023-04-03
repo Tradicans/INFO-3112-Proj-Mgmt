@@ -44,7 +44,7 @@ const BacklogComponent = (props) => {
   }, []);
   const readProductArray = async () => {
     //Grab all products
-    let query = `query {products {_id, productname, teamname, startdate, enddate, productowner, teammembers, hoursperstorypoint, estimatestorypoints, estimatetotalcost}}`;
+    let query = `query {products {_id, productname, teamname, startdate, enddate, productowner, teammembers, hoursperstorypoint, estimatestorypoints, estimatetotalcost, sprints}}`;
     let json = await queryFunction(query);
 
     setState({ productList: json.data.products });
@@ -56,7 +56,13 @@ const BacklogComponent = (props) => {
     }
     //setState({ teamArray: [] });
     // Dropdown list of all products uses this. This selects a product from the options available and takes it's product ID and list of current sprints. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
-    let query = `query{sprintsbyproduct(productid:"${selectedOption._id}") {_id, productid, sprintname, startdate, enddate, iscompleted }}`;
+    let query = "";
+    if (selectedOption !== null) {
+      query = `query{sprintsbyproduct(productid:"${selectedOption._id}") {_id, productid, sprintname, startdate, enddate, iscompleted }}`;
+    } else {
+      query = `query{sprintsbyproduct(productid:"") {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+    }
+
     let json = await queryFunction(query);
     setState({
       selectedProduct: selectedOption,
@@ -80,13 +86,15 @@ const BacklogComponent = (props) => {
     // code to add story to db
     //todo: add priority
     //todo: change ones not collected from user to preset values
-    let query = JSON.stringify({
-      query: `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprintid: "${state.sprintID}", productid: "${state.productID}", storypoints: "${state.storyPts}", costperhour: "${state.costPerHr}", iscompleted: "${state.isCompleted}") 
-            {storyname, storydescription, sprintid, productid, storypoints, costperhour, iscompleted},
-            }`,
-    });
+    let query = `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprints: ["${state.selectedProduct.sprints[0]}"], storypoints: ${state.storyPts}, costperhour: ${state.costPerHr}, priority: ${state.priority}, tasks: []) 
+            {_id, storyname, storydescription, sprints, storypoints, costperhour, priority, tasks},
+            }`;
+    let story = await queryFunction(query);
+    query = `mutation {updatesprint(productid:"${state.selectedProduct._id}",sprintname:"Backlog",startdate:"${state.selectedProduct.startdate}",stories:["${story.data.addstory._id}"],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+
     await queryFunction(query);
     //reset state
+
     setState({
       storyName: "",
       storyDescription: "",

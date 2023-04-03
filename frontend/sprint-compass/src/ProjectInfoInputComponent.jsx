@@ -29,9 +29,15 @@ const ProjectInfoInputComponent = (props) => {
     //todo: add empty values for missing properties to complete schema
     //todo: test query functionality
     //todo: add conversions for non-string values
-    let query = `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: ${state.hoursPerStoryPt}, estimatestorypoints: ${state.storyPtEst}, estimatetotalcost: ${state.costEst} ){ productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`;
-    await queryFunction(query);
+
+    let query = `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: ${state.hoursPerStoryPt}, estimatestorypoints: ${state.storyPtEst}, estimatetotalcost: ${state.costEst} ){ _id, productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`;
+
+    let product = await queryFunction(query);
+    let sprintquery = `mutation {addsprint(productid:"${product.data.addproduct._id}",sprintname:"Backlog",startdate:"${state.startDate}",stories:[],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+    let backlog = await queryFunction(sprintquery);
+    query = `mutation {updateproduct(_id: "${product.data.addproduct._id}", productname: "${state.productName}", teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: ${state.hoursPerStoryPt}, estimatestorypoints: ${state.storyPtEst}, estimatetotalcost: ${state.costEst}, sprints:["${backlog.data.addsprint._id}"] ){ productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost, sprints }}`;
     //reset text entry fields
+    await queryFunction(query);
     setState({
       teamName: "",
       productName: "",
