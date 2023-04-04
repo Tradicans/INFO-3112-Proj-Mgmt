@@ -222,6 +222,8 @@ export default function TaskTableComponent(props) {
 					</TableRow>
 				</TableHead>
 				<TableBody>
+					{/* for prod need to get data from props.dataForTaskTable */}
+
 					{rows.map((row) => (
 						<Row key={row.name} row={row} />
 					))}
