@@ -57,24 +57,25 @@ import queryFunction from "./queryfunction";
 // 		],
 // 	};
 // }
-const getTasks = async (props) => {
-	let query = `query {tasksbystory(storyid:"${props.row._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
-	let task = await queryFunction(query);
-	return task.data.tasksbystory;
-};
+let storyRowTasks = [];
+// const getTasks = async (props) => {
+// 	let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+// 	let task = await queryFunction(query);
+// 	return task.data.tasksbystory;
+// };
 const initialState = {
 	showAddCard: false,
 };
 const state = initialState;
 
-const Row = async (props) => {
+async function StoryRow(props) {
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = React.useReducer(reducer, initialState);
 	//let task = getTask(props);
 
-	const { row } = props;
+	const { storyrow } = props;
 
-	let rowTasks = await getTasks(props);
+	// storyRowTasks = await getTasks(props);
 	const [open, setOpen] = React.useState(false);
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
@@ -106,20 +107,20 @@ const Row = async (props) => {
 			<TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
 				<TableCell>
 					<IconButton
-						aria-label="expand row"
+						aria-label="expand storyrow"
 						size="small"
 						onClick={() => setOpen(!open)}
 					>
 						{open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
 					</IconButton>
 				</TableCell>
-				<TableCell component="th" scope="row">
-					{row.storyname}
+				<TableCell component="th" scope="storyrow">
+					{storyrow.storyname}
 				</TableCell>
-				<TableCell>{row.storydescription}</TableCell>
-				<TableCell align="right">{row.priority}</TableCell>
-				<TableCell align="right">{row.storypoints}</TableCell>
-				<TableCell align="right">{row.costperhour}</TableCell>
+				<TableCell>{storyrow.storydescription}</TableCell>
+				<TableCell align="right">{storyrow.priority}</TableCell>
+				<TableCell align="right">{storyrow.storypoints}</TableCell>
+				<TableCell align="right">{storyrow.costperhour}</TableCell>
 				<TableCell align="right">
 					<IconButton
 						color="secondary"
@@ -156,7 +157,7 @@ const Row = async (props) => {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{rowTasks.map((taskRow, index) => (
+									{storyRowTasks.map((taskRow, index) => (
 										<TableRow
 											hover
 											// onClick={(event) => handleClick(event, taskRow._id)}
@@ -175,7 +176,7 @@ const Row = async (props) => {
 													// onChange={onSelectAllClick}
 												/>
 											</TableCell>
-											<TableCell component="th" scope="row">
+											<TableCell component="th" scope="storyrow">
 												{taskRow.taskname}
 											</TableCell>
 											<TableCell>{taskRow.taskdetails}</TableCell>
@@ -212,7 +213,7 @@ const Row = async (props) => {
 			</TableRow>
 		</React.Fragment>
 	);
-};
+}
 
 //*******************for dev
 // const rows = [
@@ -295,8 +296,8 @@ const TaskTableComponent = (props) => {
 					</TableRow>
 				</TableHead>
 				<TableBody>
-					{rows.map((row) => (
-						<Row key={row._id} row={row} />
+					{rows.map((storyrow) => (
+						<StoryRow key={storyrow._id} storyrow={storyrow} />
 					))}
 				</TableBody>
 			</Table>
