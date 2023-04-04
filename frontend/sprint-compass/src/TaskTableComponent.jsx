@@ -1,9 +1,13 @@
 import * as React from "react";
 import {
 	Box,
+	Card,
+	CardHeader,
+	CardContent,
 	Collapse,
 	Checkbox,
 	IconButton,
+	Modal,
 	Table,
 	TableBody,
 	TableCell,
@@ -16,6 +20,8 @@ import {
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import AddCircle from "@mui/icons-material/AddCircle";
+
 import theme from "./theme";
 import "./App.css";
 import queryFunction from "./queryfunction";
@@ -36,6 +42,7 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 				details: "task1 deets",
 				teammember: "Amber",
 				hrscomplete: 5,
+				addtosprint: "",
 				isComplete: true,
 			},
 			{
@@ -44,12 +51,19 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 				details: "task2 deets",
 				teammember: "Ryan",
 				hrscomplete: 8,
+				addtosprint: "",
 				isComplete: false,
 			},
 		],
 	};
 }
+// const initialState = {
+// 	showAddCard: false,
+// };
+// const reducer = (state, newState) => ({ ...state, ...newState });
+
 function Row(props) {
+	// const [state, setState] = React.useReducer(reducer, initialState);
 	const { row } = props;
 	const [open, setOpen] = React.useState(false);
 	const handleClick = (event, taskid) => {
@@ -63,6 +77,18 @@ function Row(props) {
 	const handleHrsInput = (e) => {
 		//todo: task mutation query
 		//update hrs
+	};
+	const handleSprintChange = (e) => {
+		//todo: story mutation query
+		//update sprint array within story
+		//todo: sprint mutation query
+		//update story array within sprint
+	};
+	const showModal = () => {
+		setState({ showAddCard: true });
+	};
+	const closeModal = () => {
+		setState({ showAddCard: false });
 	};
 	return (
 		<React.Fragment>
@@ -83,6 +109,16 @@ function Row(props) {
 				<TableCell align="right">{row.priority}</TableCell>
 				<TableCell align="right">{row.storyPts}</TableCell>
 				<TableCell align="right">{row.cost}</TableCell>
+				<TableCell align="right">
+					<IconButton
+						color="secondary"
+						aria-label="add task"
+						size="small"
+						// onClick={showModal}
+					>
+						<AddCircle fontSize="large" />
+					</IconButton>
+				</TableCell>
 			</TableRow>
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -105,6 +141,7 @@ function Row(props) {
 										<TableCell>Details</TableCell>
 										<TableCell>Team Member</TableCell>
 										<TableCell>Hours Complete</TableCell>
+										<TableCell>Add to Sprint</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
@@ -146,6 +183,14 @@ function Row(props) {
 												/>
 											</TableCell>
 											{/* todo: make teammember an autocomplete textbox 											 */}
+											<TableCell>
+												<TextField
+													onChange={handleSprintChange}
+													placeholder="Select sprint"
+													value={taskRow.addtosprint}
+												/>
+											</TableCell>
+											{/* todo: make sprint an autocomplete textbox 											 */}
 										</TableRow>
 									))}
 								</TableBody>
@@ -173,6 +218,15 @@ const rows = [
 export default function TaskTableComponent() {
 	return (
 		<TableContainer component={Paper}>
+			{/* <Modal open={state.showAddCard}>
+				<Card className="card">
+					<CardHeader
+						title="Add User Story"
+						style={{ color: theme.palette.primary.main, textAlign: "center" }}
+					/>
+					<CardContent></CardContent>
+				</Card>
+			</Modal> */}
 			<Table aria-label="collapsible table">
 				<TableHead>
 					<TableRow>
@@ -216,6 +270,14 @@ export default function TaskTableComponent() {
 								style={{ color: theme.palette.primary.main }}
 							>
 								Cost Per Hour
+							</Typography>
+						</TableCell>
+						<TableCell align="right">
+							<Typography
+								variant="h6"
+								style={{ color: theme.palette.primary.main }}
+							>
+								Add Task
 							</Typography>
 						</TableCell>
 					</TableRow>
