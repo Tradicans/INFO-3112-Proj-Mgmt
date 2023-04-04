@@ -1,21 +1,19 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import * as cfg from "./config.js";
-import got from "got";
+//import got from "got";
 
 let db;
 const getDBInstance = async () => {
   if (db) {
-    console.log("using established connection");
+    console.log(`using established connection`);
     return db;
   }
+  let MongoOptions = { useNewUrlParser: true, useUnifiedTopology: true };
   try {
-    const client = new MongoClient(cfg.atlas, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log("establishing new connection to Atlas");
+    const client = new MongoClient(cfg.dbUrl, MongoOptions);
+    console.log(`establishing new connection to Atlas.`);
     const conn = await client.connect();
-    db = conn.db(cfg.appdb);
+    db = conn.db(cfg.db);
   } catch (err) {
     console.log(err);
   }
@@ -24,6 +22,8 @@ const getDBInstance = async () => {
 const addOne = (db, coll, doc) => db.collection(coll).insertOne(doc);
 const count = (db, coll) => db.collection(coll).countDocuments();
 const deleteAll = (db, coll) => db.collection(coll).deleteMany({});
+const deleteMuch = (db, coll, criteria) =>
+  db.collection(coll).deleteMany(criteria);
 const addMany = (db, coll, docs) => db.collection(coll).insertMany(docs);
 const findOne = (db, coll, criteria) => db.collection(coll).findOne(criteria);
 const findAll = (db, coll, criteria, projection) =>
@@ -34,7 +34,7 @@ const updateOne = (db, coll, criteria, projection) =>
     .findOneAndUpdate(criteria, { $set: projection }, { rawResult: true });
 const deleteOne = (db, coll, criteria) =>
   db.collection(coll).deleteOne(criteria);
-const getJSONFromWWWPromise = (url) => got(url).json();
+//const getJSONFromWWWPromise = (url) => got(url).json(); //For now we don't have/need got dependencies.
 const findUniqueValues = (db, coll, field) =>
   db.collection(coll).distinct(field);
 
@@ -43,11 +43,13 @@ export {
   addOne,
   count,
   deleteAll,
+  deleteMuch,
   addMany,
   findOne,
   findAll,
   updateOne,
   deleteOne,
-  getJSONFromWWWPromise,
+  //getJSONFromWWWPromise,
   findUniqueValues,
+  ObjectId,
 };
