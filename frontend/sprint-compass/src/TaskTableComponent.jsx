@@ -50,7 +50,7 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 	};
 }
 function Row(props) {
-	const { row } = props.dataForTaskTable;
+	const { row } = props;
 	const [open, setOpen] = React.useState(false);
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
@@ -108,6 +108,7 @@ function Row(props) {
 									</TableRow>
 								</TableHead>
 								<TableBody>
+									{/* for prod need to get data from props.dataForTaskTable */}
 									{row.tasks.map((taskRow) => (
 										<TableRow
 											hover
@@ -170,7 +171,7 @@ const rows = [
 //done: checkboxes on task rows
 //todo: tie in checkboxes to isComplete - use mutation
 
-export default function TaskTableComponent() {
+export default function TaskTableComponent(props) {
 	return (
 		<TableContainer component={Paper}>
 			<Table aria-label="collapsible table">
