@@ -1,9 +1,9 @@
 import * as React from "react";
-import PropTypes from "prop-types";
 import { ThemeProvider } from "@mui/material/styles";
 import {
 	Box,
 	Collapse,
+	Checkbox,
 	IconButton,
 	Table,
 	TableBody,
@@ -13,6 +13,7 @@ import {
 	TableRow,
 	Typography,
 	Paper,
+	TextField,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -21,33 +22,46 @@ import "./App.css";
 import HomeComponent from "./HomeComponent";
 import queryFunction from "./queryfunction";
 
-function createData(name, calories, fat, carbs, protein, price) {
+function createData(storyid, name, description, priority, storyPts, cost) {
 	return {
+		storyid,
 		name,
-		calories,
-		fat,
-		carbs,
-		protein,
-		price,
-		history: [
+		description,
+		priority,
+		storyPts,
+		cost,
+		tasks: [
 			{
-				date: "2020-01-05",
-				customerId: "11091700",
-				amount: 3,
+				taskid: "abc123",
+				name: "task1",
+				details: "task1 deets",
+				teammember: "Amber",
+				hrscomplete: 5,
+				isComplete: 0,
 			},
 			{
-				date: "2020-01-02",
-				customerId: "Anonymous",
-				amount: 1,
+				taskid: "abc456",
+				name: "task2",
+				details: "task2 deets",
+				teammember: "Ryan",
+				hrscomplete: 8,
+				isComplete: 0,
 			},
 		],
 	};
 }
-
 function Row(props) {
+	const handleClick = (event, taskid) => {
+		//todo: task mutation query
+	};
 	const { row } = props;
 	const [open, setOpen] = React.useState(false);
-
+	const handleUserNameInput = (e) => {
+		//todo: task mutation query
+	};
+	const handleHrsInput = (e) => {
+		//todo: task mutation query
+	};
 	return (
 		<React.Fragment>
 			<TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -63,38 +77,73 @@ function Row(props) {
 				<TableCell component="th" scope="row">
 					{row.name}
 				</TableCell>
-				<TableCell align="right">{row.calories}</TableCell>
-				<TableCell align="right">{row.fat}</TableCell>
-				<TableCell align="right">{row.carbs}</TableCell>
-				<TableCell align="right">{row.protein}</TableCell>
+				<TableCell>{row.description}</TableCell>
+				<TableCell align="right">{row.priority}</TableCell>
+				<TableCell align="right">{row.storyPts}</TableCell>
+				<TableCell align="right">{row.cost}</TableCell>
 			</TableRow>
 			<TableRow>
 				<TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
 					<Collapse in={open} timeout="auto" unmountOnExit>
 						<Box sx={{ margin: 1 }}>
-							<Typography variant="h6" gutterBottom component="div">
-								History
+							<Typography
+								variant="h6"
+								gutterBottom
+								component="div"
+								style={{ color: theme.palette.secondary.main }}
+							>
+								Tasks
 							</Typography>
 							<Table size="small" aria-label="purchases">
 								<TableHead>
 									<TableRow>
-										<TableCell>Date</TableCell>
-										<TableCell>Customer</TableCell>
-										<TableCell align="right">Amount</TableCell>
-										<TableCell align="right">Total price ($)</TableCell>
+										<TableCell>Complete?</TableCell>
+
+										<TableCell>Name</TableCell>
+										<TableCell>Details</TableCell>
+										<TableCell>Team Member</TableCell>
+										<TableCell>Hours Complete</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{row.history.map((historyRow) => (
-										<TableRow key={historyRow.date}>
+									{row.tasks.map((taskRow) => (
+										<TableRow
+											hover
+											onClick={(event) => handleClick(event, row.tasks.taskid)}
+											role="checkbox"
+											aria-checked={taskRow.isComplete}
+											tabIndex={-1}
+											key={taskRow.taskid}
+											selected={taskRow.isComplete}
+											sx={{ cursor: "pointer" }}
+										>
+											{" "}
+											<TableCell padding="checkbox">
+												<Checkbox
+													color="primary"
+													checked={taskRow.isComplete}
+													// onChange={onSelectAllClick}
+												/>
+											</TableCell>
 											<TableCell component="th" scope="row">
-												{historyRow.date}
+												{taskRow.name}
 											</TableCell>
-											<TableCell>{historyRow.customerId}</TableCell>
-											<TableCell align="right">{historyRow.amount}</TableCell>
-											<TableCell align="right">
-												{Math.round(historyRow.amount * row.price * 100) / 100}
+											<TableCell>{taskRow.details}</TableCell>
+											<TableCell>
+												<TextField
+													onChange={handleUserNameInput}
+													placeholder="Team Member"
+													value={taskRow.teammember}
+												/>
 											</TableCell>
+											<TableCell>
+												<TextField
+													onChange={handleHrsInput}
+													placeholder="Hours Completed"
+													value={taskRow.hrscomplete}
+												/>
+											</TableCell>
+											{/* todo: make teammember an autocomplete textbox 											 */}
 										</TableRow>
 									))}
 								</TableBody>
@@ -107,31 +156,17 @@ function Row(props) {
 	);
 }
 
-Row.propTypes = {
-	row: PropTypes.shape({
-		calories: PropTypes.number.isRequired,
-		carbs: PropTypes.number.isRequired,
-		fat: PropTypes.number.isRequired,
-		history: PropTypes.arrayOf(
-			PropTypes.shape({
-				amount: PropTypes.number.isRequired,
-				customerId: PropTypes.string.isRequired,
-				date: PropTypes.string.isRequired,
-			})
-		).isRequired,
-		name: PropTypes.string.isRequired,
-		price: PropTypes.number.isRequired,
-		protein: PropTypes.number.isRequired,
-	}).isRequired,
-};
-
 const rows = [
-	createData("Frozen yoghurt", 159, 6.0, 24, 4.0, 3.99),
-	createData("Ice cream sandwich", 237, 9.0, 37, 4.3, 4.99),
-	createData("Eclair", 262, 16.0, 24, 6.0, 3.79),
-	createData("Cupcake", 305, 3.7, 67, 4.3, 2.5),
-	createData("Gingerbread", 356, 16.0, 49, 3.9, 1.5),
+	createData(1, "Story 1", "First Story", 1, 3, 65.0),
+	createData(2, "Story 2", "Second Story", 3, 1, 75.0),
+	createData(3, "Story 3", "Third Story", 2, 5, 65.0),
+	createData(4, "Story 4", "Fourth Story", 5, 8, 45.0),
+	createData(5, "Story 5", "Fifth Story", 4, 2, 65.0),
 ];
+//todo: add label to backlog product autocomplete
+//todo: add sprint autocomplete in backlog
+//done: checkboxes on task rows
+//todo: tie in checkboxes to isComplete - use mutation
 
 export default function TaskTableComponent() {
 	return (
@@ -140,11 +175,47 @@ export default function TaskTableComponent() {
 				<TableHead>
 					<TableRow>
 						<TableCell />
-						<TableCell>Dessert (100g serving)</TableCell>
-						<TableCell align="right">Calories</TableCell>
-						<TableCell align="right">Fat&nbsp;(g)</TableCell>
-						<TableCell align="right">Carbs&nbsp;(g)</TableCell>
-						<TableCell align="right">Protein&nbsp;(g)</TableCell>
+
+						<TableCell>
+							<Typography
+								variant="h6"
+								style={{ color: theme.palette.primary.main }}
+							>
+								Story
+							</Typography>
+						</TableCell>
+						<TableCell>
+							<Typography
+								variant="h6"
+								style={{ color: theme.palette.primary.main }}
+							>
+								Description
+							</Typography>
+						</TableCell>
+						<TableCell align="right">
+							<Typography
+								variant="h6"
+								style={{ color: theme.palette.primary.main }}
+							>
+								Priority
+							</Typography>
+						</TableCell>
+						<TableCell align="right">
+							<Typography
+								variant="h6"
+								style={{ color: theme.palette.primary.main }}
+							>
+								Story Points
+							</Typography>
+						</TableCell>
+						<TableCell align="right">
+							<Typography
+								variant="h6"
+								style={{ color: theme.palette.primary.main }}
+							>
+								Cost Per Hour
+							</Typography>
+						</TableCell>
 					</TableRow>
 				</TableHead>
 				<TableBody>

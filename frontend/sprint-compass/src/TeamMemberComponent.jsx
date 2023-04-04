@@ -34,6 +34,9 @@ const TeamMemberComponent = (props) => {
 
   const reducer = (state, newState) => ({ ...state, ...newState });
   const [state, setState] = useReducer(reducer, initialState);
+  const sendSnack = (msg) => {
+    props.dataFromTeam(msg);
+  };
   //todo: uncomment when query can be used
   useEffect(() => {
     readProductArray();
