@@ -73,7 +73,7 @@ const BacklogComponent = (props) => {
 		} else {
 			//load existing array if exists
 
-			let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority}}`;
+			let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority, tasks}}`;
 			//todo: test this returns array of stories as expected
 			let json = await queryFunction(query);
 			setState({ stories: json.data.storiesbysprint });
@@ -131,9 +131,6 @@ const BacklogComponent = (props) => {
 		setState({ costPerHr: e.target.value });
 	};
 
-	//done: set up table rather than list for card content
-	//todo: add label to backlog product autocomplete
-	//todo: add sprint autocomplete in backlog
 	return (
 		<ThemeProvider theme={theme}>
 			<Card className="card">
@@ -253,7 +250,7 @@ const BacklogComponent = (props) => {
 							})}
 						</List>
 					}
-					<TaskTableComponent />
+					<TaskTableComponent storiesForTable={state.stories} />
 				</CardContent>
 				<CardContent>
 					<IconButton

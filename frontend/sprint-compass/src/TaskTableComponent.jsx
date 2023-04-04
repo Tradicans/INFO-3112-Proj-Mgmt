@@ -27,44 +27,54 @@ import "./App.css";
 import queryFunction from "./queryfunction";
 
 //**************for dev only
-function createData(storyid, name, description, priority, storyPts, cost) {
-	return {
-		storyid,
-		name,
-		description,
-		priority,
-		storyPts,
-		cost,
-		tasks: [
-			{
-				taskid: "abc123",
-				name: "task1",
-				details: "task1 deets",
-				teammember: "Amber",
-				hrscomplete: 5,
-				addtosprint: "",
-				isComplete: true,
-			},
-			{
-				taskid: "abc456",
-				name: "task2",
-				details: "task2 deets",
-				teammember: "Ryan",
-				hrscomplete: 8,
-				addtosprint: "",
-				isComplete: false,
-			},
-		],
-	};
-}
-// const initialState = {
-// 	showAddCard: false,
-// };
-// const reducer = (state, newState) => ({ ...state, ...newState });
+// function createData(storyid, name, description, priority, storyPts, cost) {
+// 	return {
+// 		storyid,
+// 		name,
+// 		description,
+// 		priority,
+// 		storyPts,
+// 		cost,
+// 		tasks: [
+// 			{
+// 				taskid: "abc123",
+// 				name: "task1",
+// 				details: "task1 deets",
+// 				teammember: "Amber",
+// 				hrscomplete: 5,
+// 				addtosprint: "",
+// 				isComplete: true,
+// 			},
+// 			{
+// 				taskid: "abc456",
+// 				name: "task2",
+// 				details: "task2 deets",
+// 				teammember: "Ryan",
+// 				hrscomplete: 8,
+// 				addtosprint: "",
+// 				isComplete: false,
+// 			},
+// 		],
+// 	};
+// }
+const getTasks = async (props) => {
+	let query = `query {tasksbystory(storyid:"${props.row._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+	let task = await queryFunction(query);
+	return task.data.tasksbystory;
+};
+const initialState = {
+	showAddCard: false,
+};
+const state = initialState;
 
-function Row(props) {
-	// const [state, setState] = React.useReducer(reducer, initialState);
+const Row = async (props) => {
+	const reducer = (state, newState) => ({ ...state, ...newState });
+	const [state, setState] = React.useReducer(reducer, initialState);
+	//let task = getTask(props);
+
 	const { row } = props;
+
+	let rowTasks = await getTasks(props);
 	const [open, setOpen] = React.useState(false);
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
@@ -84,6 +94,7 @@ function Row(props) {
 		//todo: sprint mutation query
 		//update story array within sprint
 	};
+	//todo: move out of scope
 	const showModal = () => {
 		setState({ showAddCard: true });
 	};
@@ -103,12 +114,12 @@ function Row(props) {
 					</IconButton>
 				</TableCell>
 				<TableCell component="th" scope="row">
-					{row.name}
+					{row.storyname}
 				</TableCell>
-				<TableCell>{row.description}</TableCell>
+				<TableCell>{row.storydescription}</TableCell>
 				<TableCell align="right">{row.priority}</TableCell>
-				<TableCell align="right">{row.storyPts}</TableCell>
-				<TableCell align="right">{row.cost}</TableCell>
+				<TableCell align="right">{row.storypoints}</TableCell>
+				<TableCell align="right">{row.costperhour}</TableCell>
 				<TableCell align="right">
 					<IconButton
 						color="secondary"
@@ -145,29 +156,29 @@ function Row(props) {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{row.tasks.map((taskRow) => (
+									{rowTasks.map((taskRow, index) => (
 										<TableRow
 											hover
-											onClick={(event) => handleClick(event, row.tasks.taskid)}
+											// onClick={(event) => handleClick(event, taskRow._id)}
 											role="checkbox"
-											aria-checked={taskRow.isComplete}
+											aria-checked={taskRow.iscompleted}
 											tabIndex={-1}
-											key={taskRow.taskid}
-											selected={taskRow.isComplete}
+											key={index}
+											selected={taskRow.iscompleted}
 											sx={{ cursor: "pointer" }}
 										>
 											{" "}
 											<TableCell padding="checkbox">
 												<Checkbox
 													color="primary"
-													checked={taskRow.isComplete}
+													checked={taskRow.iscompleted}
 													// onChange={onSelectAllClick}
 												/>
 											</TableCell>
 											<TableCell component="th" scope="row">
-												{taskRow.name}
+												{taskRow.taskname}
 											</TableCell>
-											<TableCell>{taskRow.details}</TableCell>
+											<TableCell>{taskRow.taskdetails}</TableCell>
 											<TableCell>
 												<TextField
 													onChange={handleUserNameInput}
@@ -179,7 +190,7 @@ function Row(props) {
 												<TextField
 													onChange={handleHrsInput}
 													placeholder="Hours Completed"
-													value={taskRow.hrscomplete}
+													value={taskRow.hourscompleted}
 												/>
 											</TableCell>
 											{/* todo: make teammember an autocomplete textbox 											 */}
@@ -187,7 +198,7 @@ function Row(props) {
 												<TextField
 													onChange={handleSprintChange}
 													placeholder="Select sprint"
-													value={taskRow.addtosprint}
+													// value={taskRow.addtosprint}
 												/>
 											</TableCell>
 											{/* todo: make sprint an autocomplete textbox 											 */}
@@ -201,21 +212,22 @@ function Row(props) {
 			</TableRow>
 		</React.Fragment>
 	);
-}
+};
 
 //*******************for dev
-const rows = [
-	createData(1, "Story 1", "First Story", 1, 3, 65.0),
-	createData(2, "Story 2", "Second Story", 3, 1, 75.0),
-	createData(3, "Story 3", "Third Story", 2, 5, 65.0),
-	createData(4, "Story 4", "Fourth Story", 5, 8, 45.0),
-	createData(5, "Story 5", "Fifth Story", 4, 2, 65.0),
-];
+// const rows = [
+// 	createData(1, "Story 1", "First Story", 1, 3, 65.0),
+// 	createData(2, "Story 2", "Second Story", 3, 1, 75.0),
+// 	createData(3, "Story 3", "Third Story", 2, 5, 65.0),
+// 	createData(4, "Story 4", "Fourth Story", 5, 8, 45.0),
+// 	createData(5, "Story 5", "Fifth Story", 4, 2, 65.0),
+// ];
 
 //done: checkboxes on task rows
 //todo: tie in checkboxes to isComplete - use mutation
 
-export default function TaskTableComponent() {
+const TaskTableComponent = (props) => {
+	const rows = props.storiesForTable;
 	return (
 		<TableContainer component={Paper}>
 			{/* <Modal open={state.showAddCard}>
@@ -284,10 +296,12 @@ export default function TaskTableComponent() {
 				</TableHead>
 				<TableBody>
 					{rows.map((row) => (
-						<Row key={row.name} row={row} />
+						<Row key={row._id} row={row} />
 					))}
 				</TableBody>
 			</Table>
 		</TableContainer>
 	);
-}
+};
+
+export default TaskTableComponent;
