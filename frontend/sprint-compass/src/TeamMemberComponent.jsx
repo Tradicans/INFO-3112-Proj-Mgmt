@@ -39,42 +39,62 @@ const TeamMemberComponent = (props) => {
 	};
 	//todo: uncomment when query can be used
 	useEffect(() => {
-		readTeamArray();
+		readProductArray();
 	}, []);
+
+	const productSelection = async (e, selectedOption, reason) => {
+		if (reason === "clear") {
+			setState({ teamArray: [], selectedProduct: {} });
+		}
+		//setState({ teamArray: [] });
+		// Dropdown list of all products uses this. This selects a product from the options available and takes it's product ID and list of current users. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
+		let query = ``;
+		if (selectedOption !== null) {
+			query = `query {usersbyproduct(productid: "${selectedOption._id}"){name, role}}`;
+		} else {
+			query = `query {usersbyproduct(productid: ""){name, role}}`;
+		}
+		let json = await queryFunction(query);
+		setState({
+			selectedProduct: selectedOption,
+			teamArray: json.data.usersbyproduct,
+		});
+	};
+
+	const readProductArray = async () => {
+		//Grab all products
+		let query = `query {products {_id, productname, teamname, startdate, enddate, productowner, teammembers, hoursperstorypoint, estimatestorypoints, estimatetotalcost}}`;
+		let json = await queryFunction(query);
+
+		setState({ productList: json.data.products });
+	};
+
 	const readTeamArray = async () => {
 		//load existing array if exists
-		let query = JSON.stringify({
-			query: `query {products{teammembers}}`,
-		});
-		try {
-			let json = await queryFunction(query);
-			//todo: check this returns just the team array of names as expected
-			setState({ teamArray: json.data.products.teammembers });
-		} catch (error) {
-			sendSnack(`Problem loading server data - ${error.message}`);
-		}
+		let query = `query {usersbyproduct(productid: "${state.selectedProduct}")}`;
+		let json = await queryFunction(query);
+		//todo: check this returns just the team array of names as expected
+		setState({ teamArray: json.data.usersbyproduct.name });
+		//todo: error handling if needed if query returns null, still need page to load
 	};
+
 	const onCancelClicked = () => {
 		closeModal();
-		setState({ newName: "" });
 	};
 	const onAddClicked = async () => {
 		//todo: code to add team member to db
 		//need to pull existing array with one query, add teammember, then a second query to return modified array?
-		let query = JSON.stringify({
-			query: ``,
-		});
-		try {
-			let json = await queryFunction(query);
-			sendSnack(
-				`${state.newName} added to ${json.data.product.productname} team`
-			);
-		} catch (error) {
-			sendSnack(`Problem adding team member - ${error.message}`);
-		}
+		let query = `mutation{adduser(name:"${state.newName}",role:"${state.newRole}"){_id, name, role}}`;
+		let json = await queryFunction(query);
 		//reset name
-		setState({ newName: "" });
-		closeModal();
+		//state.selectedProduct.teammembers.push(json.data.adduser._id);
+		let updateQuery = `mutation{updateuser(_id:"${json.data.adduser._id}", name:"${state.newName}", role: "${state.newRole}", products: "${state.selectedProduct._id}") {_id, name, role}}`;
+		let secondJson = await queryFunction(updateQuery);
+		if (secondJson !== null) {
+			setState({ newName: "", newRole: "" });
+			closeModal();
+			useEffect();
+		}
 	};
 	const showModal = () => {
 		setState({ showAddCard: true });
@@ -85,6 +105,10 @@ const TeamMemberComponent = (props) => {
 	const handleNewNameInput = (e) => {
 		setState({ newName: e.target.value });
 	};
+	const handleNewRoleInput = (e) => {
+		setState({ newRole: e.target.value });
+	};
+
 	const emptyorundefined = state.newName === undefined || state.newName === "";
 	return (
 		<ThemeProvider theme={theme}>
@@ -103,6 +127,14 @@ const TeamMemberComponent = (props) => {
 									onChange={handleNewNameInput}
 									placeholder="Team Member Name"
 									value={state.newName}
+								/>
+							</div>
+							<div style={{ textAlign: "center" }}>
+								<TextField
+									style={{ margin: "1vw", width: "52vw" }}
+									onChange={handleNewRoleInput}
+									placeholder="Team Member's Role"
+									value={state.newRole}
 								/>
 							</div>
 							<div style={{ textAlign: "center" }}>
@@ -133,11 +165,12 @@ const TeamMemberComponent = (props) => {
 				/>
 				<CardContent>
 					<List style={{ color: theme.palette.secondary.main }}>
-						{state.teamArray.map((name, index) => {
+						{state.teamArray.map((user, index) => {
 							return (
 								<div key={index}>
 									<ListItem style={{ textAlign: "center" }}>
-										<ListItemText primary={name} />
+										<ListItemText primary={user.name} />
+										<ListItemText primary={user.role} />
 									</ListItem>
 									<Divider />
 								</div>
@@ -151,6 +184,24 @@ const TeamMemberComponent = (props) => {
 					>
 						<AddCircle fontSize="large" />
 					</IconButton>
+				</CardContent>
+				<CardContent>
+					<Autocomplete
+						id="productField"
+						options={state.productList}
+						getOptionLabel={(option) => option.productname}
+						style={{ width: 300 }}
+						onChange={productSelection}
+						renderInput={(params) => (
+							<TextField
+								{...params}
+								label={state.labelName}
+								variant="outlined"
+								fullWidth
+								data-testid="productField"
+							/>
+						)}
+					/>
 				</CardContent>
 			</Card>
 		</ThemeProvider>
