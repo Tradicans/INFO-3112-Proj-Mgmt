@@ -1,5 +1,4 @@
 import * as React from "react";
-import { ThemeProvider } from "@mui/material/styles";
 import {
 	Box,
 	Collapse,
@@ -19,9 +18,9 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import theme from "./theme";
 import "./App.css";
-import HomeComponent from "./HomeComponent";
 import queryFunction from "./queryfunction";
 
+//**************for dev only
 function createData(storyid, name, description, priority, storyPts, cost) {
 	return {
 		storyid,
@@ -53,14 +52,17 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 function Row(props) {
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
+		//change complete status
 	};
 	const { row } = props;
 	const [open, setOpen] = React.useState(false);
 	const handleUserNameInput = (e) => {
 		//todo: task mutation query
+		//update assigned user
 	};
 	const handleHrsInput = (e) => {
 		//todo: task mutation query
+		//update hrs
 	};
 	return (
 		<React.Fragment>
@@ -156,6 +158,7 @@ function Row(props) {
 	);
 }
 
+//*******************for dev
 const rows = [
 	createData(1, "Story 1", "First Story", 1, 3, 65.0),
 	createData(2, "Story 2", "Second Story", 3, 1, 75.0),
@@ -163,8 +166,7 @@ const rows = [
 	createData(4, "Story 4", "Fourth Story", 5, 8, 45.0),
 	createData(5, "Story 5", "Fifth Story", 4, 2, 65.0),
 ];
-//todo: add label to backlog product autocomplete
-//todo: add sprint autocomplete in backlog
+
 //done: checkboxes on task rows
 //todo: tie in checkboxes to isComplete - use mutation
 

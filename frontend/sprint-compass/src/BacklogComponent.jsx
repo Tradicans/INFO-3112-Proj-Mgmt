@@ -39,7 +39,6 @@ const BacklogComponent = (props) => {
 
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = useReducer(reducer, initialState);
-	//todo: uncomment when query can be used
 	useEffect(() => {
 		readProductArray();
 	}, []);
@@ -85,8 +84,6 @@ const BacklogComponent = (props) => {
 	};
 	const onAddClicked = async () => {
 		// code to add story to db
-		//todo: add priority
-		//todo: change ones not collected from user to preset values
 		let query = `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprints: ["${state.selectedProduct.sprints[0]}"], storypoints: ${state.storyPts}, costperhour: ${state.costPerHr}, priority: ${state.priority}, tasks: []) 
             {_id, storyname, storydescription, sprints, storypoints, costperhour, priority, tasks},
             }`;
@@ -131,8 +128,9 @@ const BacklogComponent = (props) => {
 		setState({ costPerHr: e.target.value });
 	};
 
-	//todo: set up table rather than list for card content
-	//use code similar to AR JS case1 advisory list?
+	//done: set up table rather than list for card content
+	//todo: add label to backlog product autocomplete
+	//todo: add sprint autocomplete in backlog
 	return (
 		<ThemeProvider theme={theme}>
 			<Card className="card">
