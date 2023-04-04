@@ -31,7 +31,6 @@ const ProjectInfoInputComponent = (props) => {
     //todo: add conversions for non-string values
 
     let query = `mutation {addproduct(productname: "${state.productName}",teamname: "${state.teamName}", startdate: "${state.startDate}", hoursperstorypoint: ${state.hoursPerStoryPt}, estimatestorypoints: ${state.storyPtEst}, estimatetotalcost: ${state.costEst} ){ _id, productname, teamname, startdate, hoursperstorypoint, estimatestorypoints, estimatetotalcost }}`;
-
     let product = await queryFunction(query);
     let sprintquery = `mutation {addsprint(productid:"${product.data.addproduct._id}",sprintname:"Backlog",startdate:"${state.startDate}",stories:[],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
     let backlog = await queryFunction(sprintquery);
