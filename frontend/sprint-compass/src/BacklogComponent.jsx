@@ -35,6 +35,7 @@ const BacklogComponent = (props) => {
 		costPerHr: "",
 		isCompleted: "",
 		productList: [],
+		datatotasktable: "",
 	};
 
 	const reducer = (state, newState) => ({ ...state, ...newState });
@@ -220,7 +221,7 @@ const BacklogComponent = (props) => {
 							/>
 						)}
 					/>
-					<TaskTableComponent />
+					<TaskTableComponent dataForTaskTable={state.datatotasktable} />
 				</CardContent>
 				<CardContent>
 					{

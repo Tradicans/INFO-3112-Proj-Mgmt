@@ -50,7 +50,7 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 	};
 }
 function Row(props) {
-	const { row } = props;
+	const { row } = props.dataForTaskTable;
 	const [open, setOpen] = React.useState(false);
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
