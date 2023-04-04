@@ -35,6 +35,8 @@ const BacklogComponent = (props) => {
     costPerHr: "",
     isCompleted: "",
     productList: [],
+    selectedSprint: {},
+    stories: [],
   };
 
   const reducer = (state, newState) => ({ ...state, ...newState });
@@ -52,32 +54,31 @@ const BacklogComponent = (props) => {
   };
 
   const productSelection = async (e, selectedOption, reason) => {
+    let query = "";
     if (reason === "clear" || selectedOption === null) {
       setState({ sprintArray: [], selectedProduct: {} });
+    } else {
+      query = `query{sprintsbyproduct(productid:"${selectedOption._id}") {_id, productid, sprintname, startdate, enddate, iscompleted }}`;
+      let json = await queryFunction(query);
+      setState({
+        selectedProduct: selectedOption,
+        sprintArray: json.data.sprintsbyproduct,
+      });
     }
     //setState({ teamArray: [] });
     // Dropdown list of all products uses this. This selects a product from the options available and takes it's product ID and list of current sprints. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
-    let query = "";
-    if (selectedOption !== null) {
-      query = `query{sprintsbyproduct(productid:"${selectedOption._id}") {_id, productid, sprintname, startdate, enddate, iscompleted }}`;
-    } else {
-      query = `query{sprintsbyproduct(productid:"") {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
-    }
-
-    let json = await queryFunction(query);
-    setState({
-      selectedProduct: selectedOption,
-      sprintArray: json.data.sprintsbyproduct,
-    });
   };
-  const readStoriesArray = async () => {
-    //load existing array if exists
-    let query = JSON.stringify({
-      query: `query {stories{}}`,
-    });
-    //todo: test this returns array of stories as expected
-    let json = await queryFunction(query);
-    setState({ storiesArray: json.data.stories });
+  const readStoriesArray = async (e, selectedOption, reason) => {
+    if (reason === "clear" || selectedOption === null) {
+      setState({ stories: [], selectedSprint: {} });
+    } else {
+      //load existing array if exists
+
+      let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority}}`;
+      //todo: test this returns array of stories as expected
+      let json = await queryFunction(query);
+      setState({ stories: json.data.storiesbysprint });
+    }
     //todo: error handling if needed if array returns null, still need page to load
   };
   const onCancelClicked = () => {
@@ -215,23 +216,36 @@ const BacklogComponent = (props) => {
             renderInput={(params) => (
               <TextField
                 {...params}
-                label={state.labelName}
+                label="Products"
                 variant="outlined"
                 fullWidth
                 data-testid="productField"
               />
             )}
           />
-          <TaskTableComponent />
-        </CardContent>
-        <CardContent>
+          <Autocomplete
+            id="sprintField"
+            options={state.sprintArray}
+            getOptionLabel={(option) => option.sprintname}
+            style={{ width: 300 }}
+            onChange={readStoriesArray}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Sprints"
+                variant="outlined"
+                fullWidth
+                data-testid="storyField"
+              />
+            )}
+          />
           {
             <List style={{ color: theme.palette.error.main }}>
-              {state.sprintArray.map((sprint, index) => {
+              {state.stories.map((story, index) => {
                 return (
                   <div key={index}>
                     <ListItem>
-                      <ListItemText primary={sprint.sprintname} />
+                      <ListItemText primary={story.storyname} />
                     </ListItem>
                     <Divider />
                   </div>
@@ -239,6 +253,9 @@ const BacklogComponent = (props) => {
               })}
             </List>
           }
+          <TaskTableComponent />
+        </CardContent>
+        <CardContent>
           <IconButton
             color="secondary"
             style={{ marginTop: 50, float: "right" }}
@@ -252,3 +269,6 @@ const BacklogComponent = (props) => {
   );
 };
 export default BacklogComponent;
+/*
+ *
+ */
