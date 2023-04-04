@@ -74,7 +74,7 @@ const BacklogComponent = (props) => {
     } else {
       //load existing array if exists
 
-      let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority}}`;
+      let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority, tasks}}`;
       //todo: test this returns array of stories as expected
       let json = await queryFunction(query);
       setState({ stories: json.data.storiesbysprint });
@@ -241,11 +241,11 @@ const BacklogComponent = (props) => {
           />
           {
             <List style={{ color: theme.palette.error.main }}>
-              {state.stories.map((story, index) => {
+              {state.stories.map((task, index) => {
                 return (
                   <div key={index}>
                     <ListItem>
-                      <ListItemText primary={story.storyname} />
+                      <ListItemText primary={task.taskname} />
                     </ListItem>
                     <Divider />
                   </div>
