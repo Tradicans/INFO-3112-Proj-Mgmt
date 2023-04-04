@@ -37,7 +37,7 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 				details: "task1 deets",
 				teammember: "Amber",
 				hrscomplete: 5,
-				isComplete: 0,
+				isComplete: true,
 			},
 			{
 				taskid: "abc456",
@@ -45,7 +45,7 @@ function createData(storyid, name, description, priority, storyPts, cost) {
 				details: "task2 deets",
 				teammember: "Ryan",
 				hrscomplete: 8,
-				isComplete: 0,
+				isComplete: false,
 			},
 		],
 	};
