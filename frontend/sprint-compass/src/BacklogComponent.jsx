@@ -41,7 +41,6 @@ const BacklogComponent = (props) => {
 
   const reducer = (state, newState) => ({ ...state, ...newState });
   const [state, setState] = useReducer(reducer, initialState);
-  //todo: uncomment when query can be used
   useEffect(() => {
     readProductArray();
   }, []);
@@ -241,11 +240,11 @@ const BacklogComponent = (props) => {
           />
           {
             <List style={{ color: theme.palette.error.main }}>
-              {state.stories.map((task, index) => {
+              {state.stories.map((story, index) => {
                 return (
                   <div key={index}>
                     <ListItem>
-                      <ListItemText primary={task.taskname} />
+                      <ListItemText primary={story.storyname} />
                     </ListItem>
                     <Divider />
                   </div>
