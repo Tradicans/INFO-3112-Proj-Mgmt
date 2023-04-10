@@ -23,7 +23,8 @@ import TaskTableComponent from "./TaskTableComponent";
 
 const BacklogComponent = (props) => {
 	const initialState = {
-		showAddCard: false,
+		showStoryAddCard: false,
+		showSprintAddCard: false,
 		sprintArray: [],
 		storyName: "",
 		storyDescription: "",
@@ -37,6 +38,9 @@ const BacklogComponent = (props) => {
 		productList: [],
 		selectedSprint: {},
 		stories: [],
+		sprintName: "",
+		sprintStartDate: "",
+		sprintEndDate: "",
 	};
 
 	const reducer = (state, newState) => ({ ...state, ...newState });
@@ -80,10 +84,10 @@ const BacklogComponent = (props) => {
 		}
 		//todo: error handling if needed if array returns null, still need page to load
 	};
-	const onCancelClicked = () => {
-		closeModal();
+	const onStoryCancelClicked = () => {
+		closeStoryModal();
 	};
-	const onAddClicked = async () => {
+	const onStoryAddClicked = async () => {
 		// code to add story to db
 		//todo: add priority
 		//todo: change ones not collected from user to preset values
@@ -107,13 +111,13 @@ const BacklogComponent = (props) => {
 			costPerHr: "",
 			isCompleted: "",
 		});
-		closeModal();
+		closeStoryModal();
 	};
-	const showModal = () => {
-		setState({ showAddCard: true });
+	const showStoryModal = () => {
+		setState({ showStoryAddCard: true });
 	};
-	const closeModal = () => {
-		setState({ showAddCard: false });
+	const closeStoryModal = () => {
+		setState({ showStoryAddCard: false });
 	};
 	const handleStoryNameInput = (e) => {
 		setState({ storyName: e.target.value });
@@ -130,12 +134,49 @@ const BacklogComponent = (props) => {
 	const handleCostInput = (e) => {
 		setState({ costPerHr: e.target.value });
 	};
+	const onSprintCancelClicked = () => {
+		closeSprintModal();
+	};
+	const onSprintAddClicked = async () => {
+		// code to add sprint to db
+
+		let query = `mutation {addsprint(productid: "${state.selectedProduct._id}", sprintname: "${state.sprintName}", startdate: "${state.sprintStartDate}", enddate: "${state.sprintEndDate}", iscompleted: false, stories: [])
+		    {_id, productid, sprintname, startdate, enddate, iscompleted, stories},
+		    }`;
+		//todo: update product to include sprint
+		// let sprint = await queryFunction(query);
+		// query = `mutation {updateproduct(productid:"${state.selectedProduct._id}",sprintname:"Backlog",startdate:"${state.selectedProduct.startdate}",stories:["${story.data.addstory._id}"],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+
+		await queryFunction(query);
+		// reset state
+		setState({
+			sprintName: "",
+			sprintStartDate: "",
+			sprintEndDate: "",
+		});
+		closeSprintModal();
+	};
+	const showSprintModal = () => {
+		setState({ showSprintAddCard: true });
+	};
+	const closeSprintModal = () => {
+		setState({ showSprintAddCard: false });
+	};
+	const handleSprintNameInput = (e) => {
+		setState({ sprintName: e.target.value });
+	};
+	const handleSprintStartDateInput = (e) => {
+		setState({ sprintStartDate: e.target.value });
+	};
+	const handleSprintEndDateInput = (e) => {
+		setState({ sprintEndDate: e.target.value });
+	};
 
 	return (
 		<ThemeProvider theme={theme}>
 			<Card className="card">
 				<HomeComponent />
-				<Modal open={state.showAddCard}>
+				<Modal open={state.showStoryAddCard}>
 					<Card className="card">
 						<CardHeader
 							title="Add User Story"
@@ -183,7 +224,7 @@ const BacklogComponent = (props) => {
 									style={{ margin: "1%", width: "25%" }}
 									color="secondary"
 									variant="contained"
-									onClick={onCancelClicked}
+									onClick={onStoryCancelClicked}
 								>
 									Cancel
 								</Button>
@@ -191,7 +232,58 @@ const BacklogComponent = (props) => {
 									style={{ margin: "1%", width: "25%" }}
 									color="secondary"
 									variant="contained"
-									onClick={onAddClicked}
+									onClick={onStoryAddClicked}
+								>
+									Add
+								</Button>
+							</div>
+						</CardContent>
+					</Card>
+				</Modal>
+				<Modal open={state.showSprintAddCard}>
+					<Card className="card">
+						<CardHeader
+							title="Add Sprint"
+							style={{ color: theme.palette.primary.main, textAlign: "center" }}
+						/>
+						<CardContent>
+							<div style={{ textAlign: "center" }}>
+								<TextField
+									style={{ margin: "1%", width: "98%" }}
+									onChange={handleSprintNameInput}
+									placeholder="Sprint Name"
+									value={state.sprintName}
+								/>
+							</div>
+							<div style={{ textAlign: "center" }}>
+								<TextField
+									style={{ margin: "1%", width: "48%" }}
+									onChange={handleSprintStartDateInput}
+									placeholder="Start Date"
+									value={state.sprintStartDate}
+								/>
+								<TextField
+									style={{ margin: "1%", width: "48%" }}
+									onChange={handleSprintEndDateInput}
+									placeholder="End Date"
+									value={state.sprintEndDate}
+								/>
+							</div>
+
+							<div style={{ textAlign: "center" }}>
+								<Button
+									style={{ margin: "1%", width: "25%" }}
+									color="secondary"
+									variant="contained"
+									onClick={onSprintCancelClicked}
+								>
+									Cancel
+								</Button>
+								<Button
+									style={{ margin: "1%", width: "25%" }}
+									color="secondary"
+									variant="contained"
+									onClick={onSprintAddClicked}
 								>
 									Add
 								</Button>
@@ -253,13 +345,24 @@ const BacklogComponent = (props) => {
 					<TaskTableComponent storiesForTable={state.stories} />
 				</CardContent>
 				<CardContent>
-					<IconButton
-						color="secondary"
-						style={{ marginTop: 50, float: "right" }}
-						onClick={showModal}
-					>
-						<AddCircle fontSize="large" />
-					</IconButton>
+					<div style={{ textAlign: "center" }}>
+						<Button
+							style={{ margin: "1%", width: "25%" }}
+							color="secondary"
+							variant="contained"
+							onClick={showStoryModal}
+						>
+							Add Story
+						</Button>
+						<Button
+							style={{ margin: "1%", width: "25%" }}
+							color="secondary"
+							variant="contained"
+							onClick={showSprintModal}
+						>
+							Add Sprint
+						</Button>
+					</div>
 				</CardContent>
 			</Card>
 		</ThemeProvider>
