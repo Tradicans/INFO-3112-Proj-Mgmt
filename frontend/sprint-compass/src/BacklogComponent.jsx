@@ -69,16 +69,17 @@ const BacklogComponent = (props) => {
 			});
 		}
 		//setState({ teamArray: [] });
-		// Dropdown list of all products uses this. This selects a product from the options available and takes it's product ID and list of current sprints. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
+		// Dropdown list of all products uses this. This selects a product from the options available and takes its product ID and list of current sprints. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
 	};
 	const readStoriesArray = async (e, selectedOption, reason) => {
 		if (reason === "clear" || selectedOption === null) {
 			setState({ stories: [], selectedSprint: {} });
 		} else {
 			//load existing array if exists
-
+			//todo: this is returning ALL stories, not just for that sprint
 			let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority, tasks}}`;
 			//todo: test this returns array of stories as expected
+
 			let json = await queryFunction(query);
 			setState({ stories: json.data.storiesbysprint });
 		}
