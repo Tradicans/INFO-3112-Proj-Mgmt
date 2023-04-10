@@ -236,7 +236,7 @@ const BacklogComponent = (props) => {
 							/>
 						)}
 					/>
-					{
+					{/* {
 						<List style={{ color: theme.palette.error.main }}>
 							{state.stories.map((story, index) => {
 								return (
@@ -249,7 +249,7 @@ const BacklogComponent = (props) => {
 								);
 							})}
 						</List>
-					}
+					} */}
 					<TaskTableComponent storiesForTable={state.stories} />
 				</CardContent>
 				<CardContent>
