@@ -76,21 +76,18 @@ const BacklogComponent = (props) => {
 			setState({ stories: [], selectedSprint: {} });
 		} else {
 			//load existing array if exists
-
 			let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority, tasks}}`;
-			//todo: test this returns array of stories as expected
+
 			let json = await queryFunction(query);
 			setState({ stories: json.data.storiesbysprint });
 		}
-		//todo: error handling if needed if array returns null, still need page to load
 	};
 	const onStoryCancelClicked = () => {
 		closeStoryModal();
 	};
 	const onStoryAddClicked = async () => {
 		// code to add story to db
-		//todo: add priority
-		//todo: change ones not collected from user to preset values
+
 		let query = `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprints: ["${state.selectedProduct.sprints[0]}"], storypoints: ${state.storyPts}, costperhour: ${state.costPerHr}, priority: ${state.priority}, tasks: []) 
             {_id, storyname, storydescription, sprints, storypoints, costperhour, priority, tasks},
             }`;
