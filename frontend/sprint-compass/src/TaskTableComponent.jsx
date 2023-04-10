@@ -58,43 +58,27 @@ import queryFunction from "./queryfunction";
 // 	};
 // }
 let storyRowTasks = [];
-// const getTasks = async (props) => {
-// 	let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
-// 	let task = await queryFunction(query);
-// 	return task.data.tasksbystory;
-// };
+const getTasks = async (props) => {
+	let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+	let task = await queryFunction(query);
+	return task.data.tasksbystory;
+};
 const initialState = {
 	showAddCard: false,
 };
 const state = initialState;
 
-async function StoryRow(props) {
+function StoryRow(props) {
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = React.useReducer(reducer, initialState);
 	//let task = getTask(props);
 
 	const { storyrow } = props;
+	// let taskrows = getTasks(props);
 
 	// storyRowTasks = await getTasks(props);
 	const [open, setOpen] = React.useState(false);
-	const handleClick = (event, taskid) => {
-		//todo: task mutation query
-		//change complete status
-	};
-	const handleUserNameInput = (e) => {
-		//todo: task mutation query
-		//update assigned user
-	};
-	const handleHrsInput = (e) => {
-		//todo: task mutation query
-		//update hrs
-	};
-	const handleSprintChange = (e) => {
-		//todo: story mutation query
-		//update sprint array within story
-		//todo: sprint mutation query
-		//update story array within sprint
-	};
+
 	//todo: move out of scope
 	const showModal = () => {
 		setState({ showAddCard: true });
@@ -144,7 +128,7 @@ async function StoryRow(props) {
 							>
 								Tasks
 							</Typography>
-							<Table size="small" aria-label="purchases">
+							<Table size="small">
 								<TableHead>
 									<TableRow>
 										<TableCell>Complete?</TableCell>
@@ -156,60 +140,87 @@ async function StoryRow(props) {
 										<TableCell>Add to Sprint</TableCell>
 									</TableRow>
 								</TableHead>
-								<TableBody>
-									{storyRowTasks.map((taskRow, index) => (
-										<TableRow
-											hover
-											// onClick={(event) => handleClick(event, taskRow._id)}
-											role="checkbox"
-											aria-checked={taskRow.iscompleted}
-											tabIndex={-1}
-											key={index}
-											selected={taskRow.iscompleted}
-											sx={{ cursor: "pointer" }}
-										>
-											{" "}
-											<TableCell padding="checkbox">
-												<Checkbox
-													color="primary"
-													checked={taskRow.iscompleted}
-													// onChange={onSelectAllClick}
-												/>
-											</TableCell>
-											<TableCell component="th" scope="storyrow">
-												{taskRow.taskname}
-											</TableCell>
-											<TableCell>{taskRow.taskdetails}</TableCell>
-											<TableCell>
-												<TextField
-													onChange={handleUserNameInput}
-													placeholder="Team Member"
-													value={taskRow.teammember}
-												/>
-											</TableCell>
-											<TableCell>
-												<TextField
-													onChange={handleHrsInput}
-													placeholder="Hours Completed"
-													value={taskRow.hourscompleted}
-												/>
-											</TableCell>
-											{/* todo: make teammember an autocomplete textbox 											 */}
-											<TableCell>
-												<TextField
-													onChange={handleSprintChange}
-													placeholder="Select sprint"
-													// value={taskRow.addtosprint}
-												/>
-											</TableCell>
-											{/* todo: make sprint an autocomplete textbox 											 */}
-										</TableRow>
+								{/* <TableBody>
+									{taskrows.map((taskrow) => (
+										<TaskRow key={taskrow._id} taskrow={taskrow} />
 									))}
-								</TableBody>
+								</TableBody> */}
 							</Table>
 						</Box>
 					</Collapse>
 				</TableCell>
+			</TableRow>
+		</React.Fragment>
+	);
+}
+
+async function TaskRow(props) {
+	const { taskrow } = props;
+	const handleClick = (event, taskid) => {
+		//todo: task mutation query
+		//change complete status
+	};
+	const handleUserNameInput = (e) => {
+		//todo: task mutation query
+		//update assigned user
+	};
+	const handleHrsInput = (e) => {
+		//todo: task mutation query
+		//update hrs
+	};
+	const handleSprintChange = (e) => {
+		//todo: story mutation query
+		//update sprint array within story
+		//todo: sprint mutation query
+		//update story array within sprint
+	};
+	return (
+		<React.Fragment>
+			<TableRow
+				hover
+				// onClick={(event) => handleClick(event, taskrow._id)}
+				role="checkbox"
+				aria-checked={taskrow.iscompleted}
+				tabIndex={-1}
+				key={index}
+				selected={taskrow.iscompleted}
+				sx={{ cursor: "pointer" }}
+			>
+				{" "}
+				<TableCell padding="checkbox">
+					<Checkbox
+						color="primary"
+						checked={taskrow.iscompleted}
+						// onChange={onSelectAllClick}
+					/>
+				</TableCell>
+				<TableCell component="th" scope="taskrow">
+					{taskrow.taskname}
+				</TableCell>
+				<TableCell>{taskrow.taskdetails}</TableCell>
+				<TableCell>
+					<TextField
+						onChange={handleUserNameInput}
+						placeholder="Team Member"
+						value={taskrow.teammember}
+					/>
+				</TableCell>
+				<TableCell>
+					<TextField
+						onChange={handleHrsInput}
+						placeholder="Hours Completed"
+						value={taskrow.hourscompleted}
+					/>
+				</TableCell>
+				{/* todo: make teammember an autocomplete textbox 											 */}
+				<TableCell>
+					<TextField
+						onChange={handleSprintChange}
+						placeholder="Select sprint"
+						// value={taskRow.addtosprint}
+					/>
+				</TableCell>
+				{/* todo: make sprint an autocomplete textbox 											 */}
 			</TableRow>
 		</React.Fragment>
 	);
