@@ -40,7 +40,7 @@ const resolvers = {
   },
   storiesbysprint: async (args) => {
     let db = await rtn.getDBInstance();
-    return await rtn.findAll(db, cfg.storyColl, {}, {});
+    return await rtn.findAll(db, cfg.storyColl, { sprints: args.sprintid }, {});
   },
   tasksbystory: async (args) => {
     let db = await rtn.getDBInstance();
@@ -48,7 +48,7 @@ const resolvers = {
       db,
       cfg.taskColl,
       {
-        /*storyid: args.storyid*/
+        storyid: args.storyid,
       },
       {}
     );
