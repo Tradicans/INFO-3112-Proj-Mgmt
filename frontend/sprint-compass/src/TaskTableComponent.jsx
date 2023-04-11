@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+	Autocomplete,
 	Box,
 	Button,
 	Card,
@@ -58,7 +59,19 @@ import queryFunction from "./queryfunction";
 // 		],
 // 	};
 // }
+const initialState = {
+	showAddCard: false,
+	storyid: "",
+	taskName: "",
+	taskDesc: "",
+	taskHrs: "",
+	taskOwner: "",
+	usersList: [],
+	//
+};
+const state = initialState;
 let taskrows = [];
+
 const getTasks = async (props) => {
 	let tasks = [];
 	if (props._id !== undefined) {
@@ -69,15 +82,6 @@ const getTasks = async (props) => {
 		taskrows = [];
 	}
 };
-const initialState = {
-	showAddCard: false,
-	storyid: "",
-	taskName: "",
-	taskDesc: "",
-	taskHrs: "",
-	taskOwner: "",
-};
-const state = initialState;
 
 const StoryRow = (props) => {
 	const reducer = (state, newState) => ({ ...state, ...newState });
@@ -87,7 +91,7 @@ const StoryRow = (props) => {
 	let storyid = storyrow._id;
 	getTasks(storyrow);
 	//
-
+	// let usersList = props.users;
 	const [open, setOpen] = React.useState(false);
 
 	const showTaskAddModal = () => {
@@ -105,17 +109,22 @@ const StoryRow = (props) => {
 	const handleTaskDescInput = (e) => {
 		setState({ taskDesc: e.target.value });
 	};
+	//for initial hours estimate on new task addition
 	const handleTaskHrsInput = (e) => {
 		setState({ taskHrs: e.target.value });
 	};
-	const handleTaskOwnerInput = (e) => {
-		setState({ taskOwner: e.target.value });
+	const handleTaskOwnerInput = (e, selectedOption, reason) => {
+		if (reason === "clear" || selectedOption === null) {
+			setState({ taskOwner: "" });
+		} else {
+			setState({ taskOwner: selectedOption });
+		}
 	};
 	const onTaskAddClicked = async () => {
 		// code to add task to db
 
 		//todo: fill this in
-		let query = `mutation {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"${state.taskOwner}",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted},}`;
+		let query = `mutation {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"${state.taskOwner.name}",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted},}`;
 		//todo: update sprint to include task
 		// let task = await queryFunction(query);
 		// query = `query {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
@@ -139,10 +148,10 @@ const StoryRow = (props) => {
 						title="Add Task"
 						style={{ color: theme.palette.primary.main, textAlign: "center" }}
 					/>
-					<CardContent>
+					<CardContent style={{ flexWrap: "nowrap", overflowX: "scroll" }}>
 						<div style={{ textAlign: "center" }}>
 							<TextField
-								style={{ margin: "1%", width: "98%" }}
+								style={{ margin: "1%", width: "90%" }}
 								onChange={handleTaskNameInput}
 								placeholder="Task Name"
 								value={state.taskName}
@@ -150,26 +159,51 @@ const StoryRow = (props) => {
 						</div>
 						<div style={{ textAlign: "center" }}>
 							<TextField
-								style={{ margin: "1%", width: "98%" }}
+								style={{ margin: "1%", width: "90%" }}
 								onChange={handleTaskDescInput}
 								placeholder="Task Details"
 								value={state.taskDesc}
 							/>
 						</div>
-						<div style={{ textAlign: "center" }}>
-							<TextField
-								style={{ margin: "1%", width: "48%" }}
-								onChange={handleTaskHrsInput}
-								placeholder="Estimated # Hours"
-								value={state.taskHrs}
-							/>
-							<TextField
+						<div
+							style={{
+								textAlign: "center",
+							}}
+						>
+							{/* <TextField
 								style={{ margin: "1%", width: "48%" }}
 								onChange={handleTaskOwnerInput}
 								placeholder="Team Member"
 								value={state.taskOwner}
+							/> */}
+							{/* done: change to dropdown autofill */}
+							<Autocomplete
+								id="userField"
+								options={state.usersList}
+								getOptionLabel={(option) => option.name}
+								onChange={handleTaskOwnerInput}
+								renderInput={(params) => (
+									<TextField
+										style={{
+											margin: "1%",
+											width: "90%",
+											flexWrap: "nowrap",
+											overflowX: "scroll",
+										}}
+										{...params}
+										label="Team Member"
+										fullWidth="false"
+										variant="outlined"
+										data-testid="userField"
+									/>
+								)}
 							/>
-							{/* todo: change to dropdown autofill */}
+							<TextField
+								style={{ margin: "1%", width: "90%" }}
+								onChange={handleTaskHrsInput}
+								placeholder="Estimated # Hours"
+								value={state.taskHrs}
+							/>
 						</div>
 						<div style={{ textAlign: "center" }}>
 							<Button
@@ -344,6 +378,7 @@ const TaskRow = (props) => {
 
 const TaskTableComponent = (props) => {
 	const rows = props.storiesForTable;
+	state.usersList = props.usersForTable;
 	return (
 		<TableContainer component={Paper}>
 			<Table aria-label="collapsible table">

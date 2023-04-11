@@ -60,13 +60,16 @@ const BacklogComponent = (props) => {
 	const productSelection = async (e, selectedOption, reason) => {
 		let query = "";
 		if (reason === "clear" || selectedOption === null) {
-			setState({ sprintArray: [], selectedProduct: {} });
+			setState({ sprintArray: [], selectedProduct: {}, users: [] });
 		} else {
 			query = `query{sprintsbyproduct(productid:"${selectedOption._id}") {_id, productid, sprintname, startdate, enddate, iscompleted }}`;
 			let json = await queryFunction(query);
+			query = `query{usersbyproduct(productid:"${selectedOption._id}") {_id, name, role, products}}`;
+			let users = await queryFunction(query);
 			setState({
 				selectedProduct: selectedOption,
 				sprintArray: json.data.sprintsbyproduct,
+				teammembers: users.data.usersbyproduct,
 			});
 		}
 		//setState({ teamArray: [] });
@@ -343,7 +346,10 @@ const BacklogComponent = (props) => {
 							})}
 						</List>
 					} */}
-					<TaskTableComponent storiesForTable={state.stories} />
+					<TaskTableComponent
+						storiesForTable={state.stories}
+						usersForTable={state.teammembers}
+					/>
 				</CardContent>
 				<CardContent>
 					<div style={{ textAlign: "center" }}>
