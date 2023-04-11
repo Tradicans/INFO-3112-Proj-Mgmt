@@ -71,6 +71,7 @@ const getTasks = async (props) => {
 };
 const initialState = {
 	showAddCard: false,
+	// storyid: "",
 	taskName: "",
 	taskDesc: "",
 	taskHrs: "",
@@ -83,6 +84,7 @@ const StoryRow = (props) => {
 	const [state, setState] = React.useReducer(reducer, initialState);
 
 	const { storyrow } = props;
+	let storyid = storyrow._id;
 	// taskrows = getTasks(props);
 
 	const [open, setOpen] = React.useState(false);
@@ -112,12 +114,10 @@ const StoryRow = (props) => {
 		// code to add task to db
 
 		//todo: fill this in
-		let query = `mutation {addtask()
-		    {},
-		    }`;
-		//todo: update product to include sprint
-		// let sprint = await queryFunction(query);
-		// query = `mutation {updateproduct(productid:"${state.selectedProduct._id}",sprintname:"Backlog",startdate:"${state.selectedProduct.startdate}",stories:["${story.data.addstory._id}"],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+		let query = `mutation {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"${state.taskOwner}",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted},}`;
+		//todo: update sprint to include task
+		// let task = await queryFunction(query);
+		// query = `query {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
 
 		await queryFunction(query);
 		// reset state
@@ -127,7 +127,7 @@ const StoryRow = (props) => {
 			taskHrs: "",
 			taskOwner: "",
 		});
-		closeSprintModal();
+		closeTaskAddModal();
 	};
 
 	return (
