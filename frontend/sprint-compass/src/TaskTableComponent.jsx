@@ -73,7 +73,7 @@ const initialState = {
 };
 const state = initialState;
 
-const Row = async (props) => {
+const Row = (props) => {
   const reducer = (state, newState) => ({ ...state, ...newState });
   const [state, setState] = React.useReducer(reducer, initialState);
   //let task = getTask(props);
