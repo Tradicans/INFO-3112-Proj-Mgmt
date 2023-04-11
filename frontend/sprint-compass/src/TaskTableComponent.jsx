@@ -294,13 +294,28 @@ const StoryRow = (props) => {
 
 const TaskRow = (props) => {
 	const { taskrow } = props;
+	const taskRowState = {
+		taskRowCompleteStatus: false,
+		taskRowUser: "",
+		taskRowHrs: 0,
+		taskRowSprint: "",
+	};
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
 		//change complete status
 	};
-	const handleUserNameInput = (e) => {
+	const handleUserNameInput = async (e, selectedOption, reason) => {
 		//todo: task mutation query
 		//update assigned user
+		let query = "";
+		if (reason === "clear" || selectedOption === null) {
+			taskRowState.taskRowUser = "";
+		} else {
+			//mutate task to change teammember
+			taskRowState.taskRowUser = selectedOption.name;
+			query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${selectedOption.name}", hourscompleted:${taskrow.hourscompleted}, iscompleted:${taskrow.iscompleted}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
+			await queryFunction(query);
+		}
 	};
 	const handleHrsInput = (e) => {
 		//todo: task mutation query
@@ -337,10 +352,31 @@ const TaskRow = (props) => {
 				</TableCell>
 				<TableCell>{taskrow.taskdetails}</TableCell>
 				<TableCell>
-					<TextField
+					{/* <TextField
 						onChange={handleUserNameInput}
 						placeholder="Team Member"
 						value={taskrow.teammember}
+					/> */}
+					<Autocomplete
+						id="rowUserField"
+						options={state.usersList}
+						getOptionLabel={(option) => option.name}
+						onChange={handleUserNameInput}
+						renderInput={(params) => (
+							<TextField
+								style={{
+									margin: "1%",
+									width: "90%",
+									flexWrap: "nowrap",
+									overflowX: "scroll",
+								}}
+								{...params}
+								label="Team Member"
+								fullWidth="false"
+								variant="outlined"
+								data-testid="userField"
+							/>
+						)}
 					/>
 				</TableCell>
 				<TableCell>
