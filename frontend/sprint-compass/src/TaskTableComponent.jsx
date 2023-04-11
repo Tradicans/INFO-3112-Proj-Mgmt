@@ -294,25 +294,16 @@ const StoryRow = (props) => {
 
 const TaskRow = (props) => {
 	const { taskrow } = props;
-	const taskRowState = {
-		taskRowCompleteStatus: false,
-		taskRowUser: "",
-		taskRowHrs: 0,
-		taskRowSprint: "",
-	};
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
 		//change complete status
 	};
 	const handleUserNameInput = async (e, selectedOption, reason) => {
-		//todo: task mutation query
 		//update assigned user
 		let query = "";
 		if (reason === "clear" || selectedOption === null) {
-			taskRowState.taskRowUser = "";
 		} else {
 			//mutate task to change teammember
-			taskRowState.taskRowUser = selectedOption.name;
 			query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${selectedOption.name}", hourscompleted:${taskrow.hourscompleted}, iscompleted:${taskrow.iscompleted}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
 			await queryFunction(query);
 		}
@@ -320,6 +311,7 @@ const TaskRow = (props) => {
 	const handleHrsInput = (e) => {
 		//todo: task mutation query
 		//update hrs
+		let query = "";
 	};
 	const handleSprintChange = (e) => {
 		//todo: story mutation query
@@ -362,6 +354,7 @@ const TaskRow = (props) => {
 						options={state.usersList}
 						getOptionLabel={(option) => option.name}
 						onChange={handleUserNameInput}
+						//
 						renderInput={(params) => (
 							<TextField
 								style={{
@@ -371,7 +364,7 @@ const TaskRow = (props) => {
 									overflowX: "scroll",
 								}}
 								{...params}
-								label="Team Member"
+								label={taskrow.teammember}
 								fullWidth="false"
 								variant="outlined"
 								data-testid="userField"
