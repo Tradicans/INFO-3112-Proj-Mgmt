@@ -68,6 +68,7 @@ const initialState = {
 	taskOwner: "",
 	usersList: [],
 	sprintid: "",
+	sprintArray: [],
 	//
 };
 const state = initialState;
@@ -296,17 +297,16 @@ const StoryRow = (props) => {
 
 const TaskRow = (props) => {
 	const { taskrow } = props;
-	const taskRowState = {
+	let taskRowState = {
 		taskRowUser: taskrow.teammember,
 		taskRowHrs: taskrow.hourscompleted,
 		taskRowSprint: "",
 		taskRowComplete: false,
 	};
-	const handleClick = (event, taskid) => {
-		//todo: task mutation query
-		//change complete status
+	const handleClick = () => {
+		taskRowState.taskRowComplete = !taskRowState.taskRowComplete;
 	};
-	const handleUserNameInput = async (e, selectedOption, reason) => {
+	const handleUserNameInput = (e, selectedOption, reason) => {
 		//update assigned user
 		if (reason === "clear" || selectedOption === null) {
 			taskRowState.taskRowUser = taskrow.teammember;
@@ -315,20 +315,37 @@ const TaskRow = (props) => {
 			taskRowState.taskRowUser = selectedOption.name;
 		}
 	};
-	const handleHrsInput = async (e) => {
+	const handleHrsInput = (e) => {
 		//update hrs - adding to total hrs for task
 		taskRowState.taskRowHrs = e.target.value;
 	};
-	const handleSprintChange = (e) => {};
+	const handleSprintChange = (e, selectedOption, reason) => {
+		//update assigned user
+		if (reason === "clear" || selectedOption === null) {
+			taskRowState.taskRowSprint = "";
+		} else {
+			taskRowState.taskRowSprint = selectedOption._id;
+		}
+	};
 	const updateTask = async () => {
-		//todo: math is broken, this
+		//todo: math is broken, this replaces value with entered value
 		taskRowState.taskRowHrs == taskRowState.taskRowHrs + taskrow.hourscompleted;
 		let query = "";
 		query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${taskRowState.taskRowUser}", hourscompleted:${taskRowState.taskRowHrs}, iscompleted:${taskRowState.taskRowComplete}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
 		await queryFunction(query);
-		//todo - additional query to update sprint
-		//use state.storyid with updatestory mutation
-		//also update sprint to list story?
+		if (taskRowState.taskRowSprint !== "") {
+			//todo - additional query to update sprint
+			//use state.storyid with updatestory mutation
+			//also update sprint to list story?
+		}
+
+		//reset fields
+		taskRowState = {
+			taskRowUser: taskrow.teammember,
+			taskRowHrs: taskrow.hourscompleted,
+			taskRowSprint: "",
+			taskRowComplete: false,
+		};
 	};
 	return (
 		<React.Fragment>
@@ -336,18 +353,19 @@ const TaskRow = (props) => {
 				hover
 				// onClick={(event) => handleClick(event, taskrow._id)}
 				role="checkbox"
-				aria-checked={taskrow.iscompleted}
+				// aria-checked={taskRowState.taskRowComplete}
 				tabIndex={-1}
 				key={taskrow._id}
-				selected={taskrow.iscompleted}
+				// selected={taskRowState.taskRowComplete}
 				sx={{ cursor: "pointer" }}
 			>
 				{" "}
 				<TableCell padding="checkbox">
 					<Checkbox
 						color="primary"
-						checked={taskrow.iscompleted}
-						// onChange={onSelectAllClick}
+						checked={taskRowState.taskRowComplete}
+						aria-checked={taskRowState.taskRowComplete}
+						onChange={handleClick}
 					/>
 				</TableCell>
 				<TableCell component="th" scope="taskrow">
@@ -388,10 +406,32 @@ const TaskRow = (props) => {
 				</TableCell>
 				{/* todo: make teammember an autocomplete textbox 											 */}
 				<TableCell>
-					<TextField
+					{/* <TextField
 						onChange={handleSprintChange}
 						placeholder="Select sprint"
 						// value={taskRow.addtosprint}
+					/> */}
+					<Autocomplete
+						id="rowSprintField"
+						options={state.sprintArray}
+						getOptionLabel={(option) => option.sprintname}
+						onChange={handleSprintChange}
+						//
+						renderInput={(params) => (
+							<TextField
+								style={{
+									margin: "1%",
+									width: "90%",
+									flexWrap: "nowrap",
+									overflowX: "scroll",
+								}}
+								{...params}
+								label="add to sprint"
+								fullWidth="false"
+								variant="outlined"
+								data-testid="sprintField"
+							/>
+						)}
 					/>
 				</TableCell>
 				{/* todo: make sprint an autocomplete textbox 											 */}
@@ -426,6 +466,7 @@ const TaskTableComponent = (props) => {
 	const rows = props.storiesForTable;
 	state.usersList = props.usersForTable;
 	state.sprintid = props.sprintForTable._id;
+	state.sprintArray = props.sprintArrayForTable;
 	return (
 		<TableContainer component={Paper}>
 			<Table aria-label="collapsible table">

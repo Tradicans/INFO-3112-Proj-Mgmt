@@ -350,6 +350,7 @@ const BacklogComponent = (props) => {
 						storiesForTable={state.stories}
 						usersForTable={state.teammembers}
 						sprintForTable={state.selectedSprint}
+						sprintArrayForTable={state.sprintArray}
 					/>
 				</CardContent>
 				<CardContent>
