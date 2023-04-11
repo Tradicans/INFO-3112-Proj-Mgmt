@@ -12,7 +12,7 @@
   "dependencies": {
     "@fastify/cors": "^8.2.0",
     "dotenv": "^16.0.3",
-    "fastify": "^4.14.1",
+    "fastify": "^4.15.0",
     "graphql": "^16.6.0",
     "mercurius": "^12.2.0",
     "mongodb": "^5.1.0"
