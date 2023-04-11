@@ -67,6 +67,7 @@ const initialState = {
 	taskHrs: "",
 	taskOwner: "",
 	usersList: [],
+	sprintid: "",
 	//
 };
 const state = initialState;
@@ -274,8 +275,9 @@ const StoryRow = (props) => {
 										<TableCell>Name</TableCell>
 										<TableCell>Details</TableCell>
 										<TableCell>Team Member</TableCell>
-										<TableCell>Hours Complete</TableCell>
+										<TableCell>Additional Hours Complete</TableCell>
 										<TableCell>Add to Sprint</TableCell>
+										<TableCell>Update Task</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
@@ -294,30 +296,39 @@ const StoryRow = (props) => {
 
 const TaskRow = (props) => {
 	const { taskrow } = props;
+	const taskRowState = {
+		taskRowUser: taskrow.teammember,
+		taskRowHrs: taskrow.hourscompleted,
+		taskRowSprint: "",
+		taskRowComplete: false,
+	};
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
 		//change complete status
 	};
 	const handleUserNameInput = async (e, selectedOption, reason) => {
 		//update assigned user
-		let query = "";
 		if (reason === "clear" || selectedOption === null) {
+			taskRowState.taskRowUser = taskrow.teammember;
 		} else {
-			//mutate task to change teammember
-			query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${selectedOption.name}", hourscompleted:${taskrow.hourscompleted}, iscompleted:${taskrow.iscompleted}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
-			await queryFunction(query);
+			//adding by name instead of id
+			taskRowState.taskRowUser = selectedOption.name;
 		}
 	};
-	const handleHrsInput = (e) => {
-		//todo: task mutation query
-		//update hrs
-		let query = "";
+	const handleHrsInput = async (e) => {
+		//update hrs - adding to total hrs for task
+		taskRowState.taskRowHrs = e.target.value;
 	};
-	const handleSprintChange = (e) => {
-		//todo: story mutation query
-		//update sprint array within story
-		//todo: sprint mutation query
-		//update story array within sprint
+	const handleSprintChange = (e) => {};
+	const updateTask = async () => {
+		//todo: math is broken, this
+		taskRowState.taskRowHrs == taskRowState.taskRowHrs + taskrow.hourscompleted;
+		let query = "";
+		query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${taskRowState.taskRowUser}", hourscompleted:${taskRowState.taskRowHrs}, iscompleted:${taskRowState.taskRowComplete}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
+		await queryFunction(query);
+		//todo - additional query to update sprint
+		//use state.storyid with updatestory mutation
+		//also update sprint to list story?
 	};
 	return (
 		<React.Fragment>
@@ -373,11 +384,7 @@ const TaskRow = (props) => {
 					/>
 				</TableCell>
 				<TableCell>
-					<TextField
-						onChange={handleHrsInput}
-						placeholder="Hours Completed"
-						value={taskrow.hourscompleted}
-					/>
+					<TextField onChange={handleHrsInput} placeholder="Hours Completed" />
 				</TableCell>
 				{/* todo: make teammember an autocomplete textbox 											 */}
 				<TableCell>
@@ -388,6 +395,16 @@ const TaskRow = (props) => {
 					/>
 				</TableCell>
 				{/* todo: make sprint an autocomplete textbox 											 */}
+				<TableCell>
+					<Button
+						style={{ margin: "1%", width: "25%" }}
+						color="secondary"
+						variant="contained"
+						onClick={updateTask}
+					>
+						Update
+					</Button>
+				</TableCell>
 			</TableRow>
 		</React.Fragment>
 	);
@@ -408,6 +425,7 @@ const TaskRow = (props) => {
 const TaskTableComponent = (props) => {
 	const rows = props.storiesForTable;
 	state.usersList = props.usersForTable;
+	state.sprintid = props.sprintForTable._id;
 	return (
 		<TableContainer component={Paper}>
 			<Table aria-label="collapsible table">

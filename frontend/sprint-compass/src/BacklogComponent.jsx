@@ -349,6 +349,7 @@ const BacklogComponent = (props) => {
 					<TaskTableComponent
 						storiesForTable={state.stories}
 						usersForTable={state.teammembers}
+						sprintForTable={state.selectedSprint}
 					/>
 				</CardContent>
 				<CardContent>
