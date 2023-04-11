@@ -266,6 +266,7 @@ const resolvers = {
           sprintname: "No sprint updated",
         };
   },
+  deletetask: async (args) => {},
   /*deleteproduct: async (args) => {
     let db = await rtn.getDBInstance();
     //let res = await rtn.deleteOne(db, cfg.productColl, { _id: args._id });
