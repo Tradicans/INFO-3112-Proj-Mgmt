@@ -44,8 +44,8 @@ type Query {
     tasksbystory(storyid: String): [Task]
     usersbyproduct(productid: String): [User]
     productsbyuser(userid: String) : [Product]
-    incompletedstories(sprintid: String) : [Story]
-    project_setup: [String]
+    incompletedstories(sprintid: String) : [Story]   
+    project_setup: String
 },
 
 type User {
@@ -115,7 +115,7 @@ type Mutation {
     deletesprint(_id: String) : String
     deletestory(_id: String) : String
     deletetask(_id: String) : String
-    deleteuser(_id: String) : String
+    deleteuser(_id: String) : String 
 },
 `;
 /*

@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
   Box,
+  Button,
   Card,
   CardHeader,
   CardContent,
@@ -17,7 +18,6 @@ import {
   Typography,
   Paper,
   TextField,
-  List,
 } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -58,12 +58,16 @@ import queryFunction from "./queryfunction";
 // 		],
 // 	};
 // }
-let rowTasks = [];
-let rows = [];
+let taskrows = [];
 const getTasks = async (props) => {
-  let query = `query {tasksbystory(storyid:"${props.row._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
-  let task = await queryFunction(query);
-  return task.data.tasksbystory;
+  let tasks = [];
+  if (props.storyrow._id !== undefined) {
+    let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+    tasks = await queryFunction(query);
+    return tasks.data.tasksbystory;
+  } else {
+    return tasks;
+  }
 };
 const TaskCheck = (props) => {
   if (props.storiesForTable !== undefined) {
@@ -75,67 +79,149 @@ const TaskCheck = (props) => {
 
 const initialState = {
   showAddCard: false,
+  taskName: "",
+  taskDesc: "",
+  taskHrs: "",
+  taskOwner: "",
 };
 const state = initialState;
 
-async function StoryRow(props) {
+const StoryRow = (props) => {
   const reducer = (state, newState) => ({ ...state, ...newState });
   const [state, setState] = React.useReducer(reducer, initialState);
-  //let task = getTask(props);
 
-  const { row } = props;
-  rowTasks = await getTasks(props);
+  const { storyrow } = props;
+  // taskrows = getTasks(props);
+
   const [open, setOpen] = React.useState(false);
-  const handleClick = (event, taskid) => {
-    //todo: task mutation query
-    //change complete status
-  };
-  const handleUserNameInput = (e) => {
-    //todo: task mutation query
-    //update assigned user
-  };
-  const handleHrsInput = (e) => {
-    //todo: task mutation query
-    //update hrs
-  };
-  const handleSprintChange = (e) => {
-    //todo: story mutation query
-    //update sprint array within story
-    //todo: sprint mutation query
-    //update story array within sprint
-  };
-  //todo: move out of scope
-  const showModal = () => {
+
+  const showTaskAddModal = () => {
     setState({ showAddCard: true });
   };
-  const closeModal = () => {
+  const closeTaskAddModal = () => {
     setState({ showAddCard: false });
   };
+  const onTaskCancelClicked = () => {
+    closeTaskAddModal();
+  };
+  const handleTaskNameInput = (e) => {
+    setState({ taskName: e.target.value });
+  };
+  const handleTaskDescInput = (e) => {
+    setState({ taskDesc: e.target.value });
+  };
+  const handleTaskHrsInput = (e) => {
+    setState({ taskHrs: e.target.value });
+  };
+  const handleTaskOwnerInput = (e) => {
+    setState({ taskOwner: e.target.value });
+  };
+  const onTaskAddClicked = async () => {
+    // code to add task to db
+
+    //todo: fill this in
+    let query = `mutation {addtask()
+		    {},
+		    }`;
+    //todo: update product to include sprint
+    // let sprint = await queryFunction(query);
+    // query = `mutation {updateproduct(productid:"${state.selectedProduct._id}",sprintname:"Backlog",startdate:"${state.selectedProduct.startdate}",stories:["${story.data.addstory._id}"],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+
+    await queryFunction(query);
+    // reset state
+    setState({
+      taskName: "",
+      taskDesc: "",
+      taskHrs: "",
+      taskOwner: "",
+    });
+    closeSprintModal();
+  };
+
   return (
     <React.Fragment>
+      <Modal open={state.showAddCard}>
+        <Card className="card">
+          <CardHeader
+            title="Add Task"
+            style={{ color: theme.palette.primary.main, textAlign: "center" }}
+          />
+          <CardContent>
+            <div style={{ textAlign: "center" }}>
+              <TextField
+                style={{ margin: "1%", width: "98%" }}
+                onChange={handleTaskNameInput}
+                placeholder="Task Name"
+                value={state.taskName}
+              />
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <TextField
+                style={{ margin: "1%", width: "98%" }}
+                onChange={handleTaskDescInput}
+                placeholder="Task Details"
+                value={state.taskDesc}
+              />
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <TextField
+                style={{ margin: "1%", width: "48%" }}
+                onChange={handleTaskHrsInput}
+                placeholder="Estimated # Hours"
+                value={state.taskHrs}
+              />
+              <TextField
+                style={{ margin: "1%", width: "48%" }}
+                onChange={handleTaskOwnerInput}
+                placeholder="Team Member"
+                value={state.taskOwner}
+              />
+              {/* todo: change to dropdown autofill */}
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <Button
+                style={{ margin: "1%", width: "25%" }}
+                color="secondary"
+                variant="contained"
+                onClick={onTaskCancelClicked}
+              >
+                Cancel
+              </Button>
+              <Button
+                style={{ margin: "1%", width: "25%" }}
+                color="secondary"
+                variant="contained"
+                onClick={onTaskAddClicked}
+              >
+                Add
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </Modal>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>
           <IconButton
-            aria-label="expand row"
+            aria-label="expand storyrow"
             size="small"
             onClick={() => setOpen(!open)}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
-          {row.storyname}
+        <TableCell component="th" scope="storyrow">
+          {storyrow.storyname}
         </TableCell>
-        <TableCell>{row.storydescription}</TableCell>
-        <TableCell align="right">{row.priority}</TableCell>
-        <TableCell align="right">{row.storypoints}</TableCell>
-        <TableCell align="right">{row.costperhour}</TableCell>
+        <TableCell>{storyrow.storydescription}</TableCell>
+        <TableCell align="right">{storyrow.priority}</TableCell>
+        <TableCell align="right">{storyrow.storypoints}</TableCell>
+        <TableCell align="right">{storyrow.costperhour}</TableCell>
         <TableCell align="right">
           <IconButton
             color="secondary"
             aria-label="add task"
             size="small"
-            // onClick={showModal}
+            onClick={showTaskAddModal}
           >
             <AddCircle fontSize="large" />
           </IconButton>
@@ -153,7 +239,7 @@ async function StoryRow(props) {
               >
                 Tasks
               </Typography>
-              <Table size="small" aria-label="purchases">
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Complete?</TableCell>
@@ -222,7 +308,7 @@ async function StoryRow(props) {
       </TableRow>
     </React.Fragment>
   );
-}
+};
 
 //*******************for dev
 // const rows = [
@@ -237,18 +323,9 @@ async function StoryRow(props) {
 //todo: tie in checkboxes to isComplete - use mutation
 
 const TaskTableComponent = (props) => {
-  TaskCheck(props);
+  const rows = props.storiesForTable;
   return (
     <TableContainer component={Paper}>
-      {/* <Modal open={state.showAddCard}>
-				<Card className="card">
-					<CardHeader
-						title="Add User Story"
-						style={{ color: theme.palette.primary.main, textAlign: "center" }}
-					/>
-					<CardContent></CardContent>
-				</Card>
-			</Modal> */}
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
@@ -305,22 +382,8 @@ const TaskTableComponent = (props) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {
-            <List style={{ color: theme.palette.error.main }}>
-              {rowTasks.map((task, index) => {
-                return (
-                  <div key={index}>
-                    <ListItem>
-                      <ListItemText primary={task.taskname} />
-                    </ListItem>
-                    <Divider />
-                  </div>
-                );
-              })}
-            </List>
-          }
           {rows.map((row) => (
-            <StoryRow key={row._id} row={row} />
+            <Row key={row._id} row={row} />
           ))}
         </TableBody>
       </Table>
