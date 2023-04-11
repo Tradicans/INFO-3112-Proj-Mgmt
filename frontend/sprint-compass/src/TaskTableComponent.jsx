@@ -61,12 +61,12 @@ import queryFunction from "./queryfunction";
 let taskrows = [];
 const getTasks = async (props) => {
 	let tasks = [];
-	if (props.storyrow._id !== undefined) {
-		let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+	if (props._id !== undefined) {
+		let query = `query {tasksbystory(storyid:"${props._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
 		tasks = await queryFunction(query);
-		return tasks.data.tasksbystory;
+		taskrows = tasks.data.tasksbystory;
 	} else {
-		return tasks;
+		taskrows = [];
 	}
 };
 const initialState = {
@@ -85,7 +85,7 @@ const StoryRow = (props) => {
 
 	const { storyrow } = props;
 	let storyid = storyrow._id;
-	// taskrows = getTasks(props);
+	getTasks(storyrow);
 	//
 
 	const [open, setOpen] = React.useState(false);
@@ -244,11 +244,11 @@ const StoryRow = (props) => {
 										<TableCell>Add to Sprint</TableCell>
 									</TableRow>
 								</TableHead>
-								{/* <TableBody>
+								<TableBody>
 									{taskrows.map((taskrow) => (
 										<TaskRow key={taskrow._id} taskrow={taskrow} />
 									))}
-								</TableBody> */}
+								</TableBody>
 							</Table>
 						</Box>
 					</Collapse>
@@ -258,7 +258,7 @@ const StoryRow = (props) => {
 	);
 };
 
-async function TaskRow(props) {
+const TaskRow = (props) => {
 	const { taskrow } = props;
 	const handleClick = (event, taskid) => {
 		//todo: task mutation query
@@ -286,7 +286,7 @@ async function TaskRow(props) {
 				role="checkbox"
 				aria-checked={taskrow.iscompleted}
 				tabIndex={-1}
-				key={index}
+				key={taskrow._id}
 				selected={taskrow.iscompleted}
 				sx={{ cursor: "pointer" }}
 			>
@@ -328,7 +328,7 @@ async function TaskRow(props) {
 			</TableRow>
 		</React.Fragment>
 	);
-}
+};
 
 //*******************for dev
 // const rows = [
