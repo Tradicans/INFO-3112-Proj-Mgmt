@@ -41,6 +41,7 @@ const BacklogComponent = (props) => {
     sprintName: "",
     sprintStartDate: "",
     sprintEndDate: "",
+    selectedProduct: "",
   };
 
   const reducer = (state, newState) => ({ ...state, ...newState });
@@ -79,7 +80,10 @@ const BacklogComponent = (props) => {
       let query = `query {storiesbysprint(sprintid:"${selectedOption._id}"){_id, storyname, storydescription, storypoints, costperhour, priority, tasks}}`;
 
       let json = await queryFunction(query);
-      setState({ stories: json.data.storiesbysprint });
+      setState({
+        stories: json.data.storiesbysprint,
+        selectedSprint: selectedOption,
+      });
     }
   };
   const onStoryCancelClicked = () => {
@@ -88,7 +92,7 @@ const BacklogComponent = (props) => {
   const onStoryAddClicked = async () => {
     // code to add story to db
 
-    let query = `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprints: ["${state.selectedProduct.sprints[0]}"], storypoints: ${state.storyPts}, costperhour: ${state.costPerHr}, priority: ${state.priority}, tasks: []) 
+    let query = `mutation {addstory(storyname: "${state.storyName}", storydescription: "${state.storyDescription}", sprints: ["${state.selectedSprint._id}"], storypoints: ${state.storyPts}, costperhour: ${state.costPerHr}, priority: ${state.priority}, tasks: []) 
             {_id, storyname, storydescription, sprints, storypoints, costperhour, priority, tasks},
             }`;
     let story = await queryFunction(query);

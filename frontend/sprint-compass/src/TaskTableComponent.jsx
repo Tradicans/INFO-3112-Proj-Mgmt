@@ -65,6 +65,11 @@ const getTasks = async (props) => {
 };
 const initialState = {
   showAddCard: false,
+  // storyid: "",
+  taskName: "",
+  taskDesc: "",
+  taskHrs: "",
+  taskOwner: "",
 };
 const state = initialState;
 
@@ -73,60 +78,137 @@ const Row = async (props) => {
   const [state, setState] = React.useReducer(reducer, initialState);
   //let task = getTask(props);
 
-  const { row } = props;
+  const { storyrow } = props;
+  let storyid = storyrow._id;
+  // taskrows = getTasks(props);
 
-  let rowTasks = await getTasks(props);
   const [open, setOpen] = React.useState(false);
-  const handleClick = (event, taskid) => {
-    //todo: task mutation query
-    //change complete status
-  };
-  const handleUserNameInput = (e) => {
-    //todo: task mutation query
-    //update assigned user
-  };
-  const handleHrsInput = (e) => {
-    //todo: task mutation query
-    //update hrs
-  };
-  const handleSprintChange = (e) => {
-    //todo: story mutation query
-    //update sprint array within story
-    //todo: sprint mutation query
-    //update story array within sprint
-  };
-  //todo: move out of scope
-  const showModal = () => {
+
+  const showTaskAddModal = () => {
     setState({ showAddCard: true });
   };
-  const closeModal = () => {
+  const closeTaskAddModal = () => {
     setState({ showAddCard: false });
   };
+  const onTaskCancelClicked = () => {
+    closeTaskAddModal();
+  };
+  const handleTaskNameInput = (e) => {
+    setState({ taskName: e.target.value });
+  };
+  const handleTaskDescInput = (e) => {
+    setState({ taskDesc: e.target.value });
+  };
+  const handleTaskHrsInput = (e) => {
+    setState({ taskHrs: e.target.value });
+  };
+  const handleTaskOwnerInput = (e) => {
+    setState({ taskOwner: e.target.value });
+  };
+  const onTaskAddClicked = async () => {
+    // code to add task to db
+
+    //todo: fill this in
+    let query = `mutation {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"${state.taskOwner}",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted},}`;
+    //todo: update sprint to include task
+    // let task = await queryFunction(query);
+    // query = `query {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+
+    await queryFunction(query);
+    // reset state
+    setState({
+      taskName: "",
+      taskDesc: "",
+      taskHrs: "",
+      taskOwner: "",
+    });
+    closeTaskAddModal();
+  };
+
   return (
     <React.Fragment>
+      <Modal open={state.showAddCard}>
+        <Card className="card">
+          <CardHeader
+            title="Add Task"
+            style={{ color: theme.palette.primary.main, textAlign: "center" }}
+          />
+          <CardContent>
+            <div style={{ textAlign: "center" }}>
+              <TextField
+                style={{ margin: "1%", width: "98%" }}
+                onChange={handleTaskNameInput}
+                placeholder="Task Name"
+                value={state.taskName}
+              />
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <TextField
+                style={{ margin: "1%", width: "98%" }}
+                onChange={handleTaskDescInput}
+                placeholder="Task Details"
+                value={state.taskDesc}
+              />
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <TextField
+                style={{ margin: "1%", width: "48%" }}
+                onChange={handleTaskHrsInput}
+                placeholder="Estimated # Hours"
+                value={state.taskHrs}
+              />
+              <TextField
+                style={{ margin: "1%", width: "48%" }}
+                onChange={handleTaskOwnerInput}
+                placeholder="Team Member"
+                value={state.taskOwner}
+              />
+              {/* todo: change to dropdown autofill */}
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <Button
+                style={{ margin: "1%", width: "25%" }}
+                color="secondary"
+                variant="contained"
+                onClick={onTaskCancelClicked}
+              >
+                Cancel
+              </Button>
+              <Button
+                style={{ margin: "1%", width: "25%" }}
+                color="secondary"
+                variant="contained"
+                onClick={onTaskAddClicked}
+              >
+                Add
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </Modal>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
         <TableCell>
           <IconButton
-            aria-label="expand row"
+            aria-label="expand storyrow"
             size="small"
             onClick={() => setOpen(!open)}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell component="th" scope="row">
-          {row.storyname}
+        <TableCell component="th" scope="storyrow">
+          {storyrow.storyname}
         </TableCell>
-        <TableCell>{row.storydescription}</TableCell>
-        <TableCell align="right">{row.priority}</TableCell>
-        <TableCell align="right">{row.storypoints}</TableCell>
-        <TableCell align="right">{row.costperhour}</TableCell>
+        <TableCell>{storyrow.storydescription}</TableCell>
+        <TableCell align="right">{storyrow.priority}</TableCell>
+        <TableCell align="right">{storyrow.storypoints}</TableCell>
+        <TableCell align="right">{storyrow.costperhour}</TableCell>
         <TableCell align="right">
           <IconButton
             color="secondary"
             aria-label="add task"
             size="small"
-            // onClick={showModal}
+            onClick={showTaskAddModal}
           >
             <AddCircle fontSize="large" />
           </IconButton>
@@ -144,7 +226,7 @@ const Row = async (props) => {
               >
                 Tasks
               </Typography>
-              <Table size="small" aria-label="purchases">
+              <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Complete?</TableCell>
