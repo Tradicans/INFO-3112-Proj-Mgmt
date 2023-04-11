@@ -65,7 +65,7 @@ const getTasks = async (props) => {
 };
 const initialState = {
   showAddCard: false,
-  // storyid: "",
+  storyid: "",
   taskName: "",
   taskDesc: "",
   taskHrs: "",
@@ -81,6 +81,7 @@ const Row = async (props) => {
   const { storyrow } = props;
   let storyid = storyrow._id;
   // taskrows = getTasks(props);
+  //
 
   const [open, setOpen] = React.useState(false);
 
