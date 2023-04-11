@@ -1,6 +1,7 @@
 import * as React from "react";
 import {
 	Box,
+	Button,
 	Card,
 	CardHeader,
 	CardContent,
@@ -57,37 +58,139 @@ import queryFunction from "./queryfunction";
 // 		],
 // 	};
 // }
-let storyRowTasks = [];
+let taskrows = [];
 const getTasks = async (props) => {
-	let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
-	let task = await queryFunction(query);
-	return task.data.tasksbystory;
+	let tasks = [];
+	if (props.storyrow._id !== undefined) {
+		let query = `query {tasksbystory(storyid:"${props.storyrow._id}"){_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+		tasks = await queryFunction(query);
+		return tasks.data.tasksbystory;
+	} else {
+		return tasks;
+	}
 };
 const initialState = {
 	showAddCard: false,
+	taskName: "",
+	taskDesc: "",
+	taskHrs: "",
+	taskOwner: "",
 };
 const state = initialState;
 
-function StoryRow(props) {
+const StoryRow = (props) => {
 	const reducer = (state, newState) => ({ ...state, ...newState });
 	const [state, setState] = React.useReducer(reducer, initialState);
-	//let task = getTask(props);
 
 	const { storyrow } = props;
-	// let taskrows = getTasks(props);
+	// taskrows = getTasks(props);
 
-	// storyRowTasks = await getTasks(props);
 	const [open, setOpen] = React.useState(false);
 
-	//todo: move out of scope
-	const showModal = () => {
+	const showTaskAddModal = () => {
 		setState({ showAddCard: true });
 	};
-	const closeModal = () => {
+	const closeTaskAddModal = () => {
 		setState({ showAddCard: false });
 	};
+	const onTaskCancelClicked = () => {
+		closeTaskAddModal();
+	};
+	const handleTaskNameInput = (e) => {
+		setState({ taskName: e.target.value });
+	};
+	const handleTaskDescInput = (e) => {
+		setState({ taskDesc: e.target.value });
+	};
+	const handleTaskHrsInput = (e) => {
+		setState({ taskHrs: e.target.value });
+	};
+	const handleTaskOwnerInput = (e) => {
+		setState({ taskOwner: e.target.value });
+	};
+	const onTaskAddClicked = async () => {
+		// code to add task to db
+
+		//todo: fill this in
+		let query = `mutation {addtask()
+		    {},
+		    }`;
+		//todo: update product to include sprint
+		// let sprint = await queryFunction(query);
+		// query = `mutation {updateproduct(productid:"${state.selectedProduct._id}",sprintname:"Backlog",startdate:"${state.selectedProduct.startdate}",stories:["${story.data.addstory._id}"],enddate:"",iscompleted:false) {_id, productid, sprintname, startdate, enddate, iscompleted}}`;
+
+		await queryFunction(query);
+		// reset state
+		setState({
+			taskName: "",
+			taskDesc: "",
+			taskHrs: "",
+			taskOwner: "",
+		});
+		closeSprintModal();
+	};
+
 	return (
 		<React.Fragment>
+			<Modal open={state.showAddCard}>
+				<Card className="card">
+					<CardHeader
+						title="Add Task"
+						style={{ color: theme.palette.primary.main, textAlign: "center" }}
+					/>
+					<CardContent>
+						<div style={{ textAlign: "center" }}>
+							<TextField
+								style={{ margin: "1%", width: "98%" }}
+								onChange={handleTaskNameInput}
+								placeholder="Task Name"
+								value={state.taskName}
+							/>
+						</div>
+						<div style={{ textAlign: "center" }}>
+							<TextField
+								style={{ margin: "1%", width: "98%" }}
+								onChange={handleTaskDescInput}
+								placeholder="Task Details"
+								value={state.taskDesc}
+							/>
+						</div>
+						<div style={{ textAlign: "center" }}>
+							<TextField
+								style={{ margin: "1%", width: "48%" }}
+								onChange={handleTaskHrsInput}
+								placeholder="Estimated # Hours"
+								value={state.taskHrs}
+							/>
+							<TextField
+								style={{ margin: "1%", width: "48%" }}
+								onChange={handleTaskOwnerInput}
+								placeholder="Team Member"
+								value={state.taskOwner}
+							/>
+							{/* todo: change to dropdown autofill */}
+						</div>
+						<div style={{ textAlign: "center" }}>
+							<Button
+								style={{ margin: "1%", width: "25%" }}
+								color="secondary"
+								variant="contained"
+								onClick={onTaskCancelClicked}
+							>
+								Cancel
+							</Button>
+							<Button
+								style={{ margin: "1%", width: "25%" }}
+								color="secondary"
+								variant="contained"
+								onClick={onTaskAddClicked}
+							>
+								Add
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			</Modal>
 			<TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
 				<TableCell>
 					<IconButton
@@ -110,7 +213,7 @@ function StoryRow(props) {
 						color="secondary"
 						aria-label="add task"
 						size="small"
-						// onClick={showModal}
+						onClick={showTaskAddModal}
 					>
 						<AddCircle fontSize="large" />
 					</IconButton>
@@ -152,7 +255,7 @@ function StoryRow(props) {
 			</TableRow>
 		</React.Fragment>
 	);
-}
+};
 
 async function TaskRow(props) {
 	const { taskrow } = props;
@@ -242,15 +345,6 @@ const TaskTableComponent = (props) => {
 	const rows = props.storiesForTable;
 	return (
 		<TableContainer component={Paper}>
-			{/* <Modal open={state.showAddCard}>
-				<Card className="card">
-					<CardHeader
-						title="Add User Story"
-						style={{ color: theme.palette.primary.main, textAlign: "center" }}
-					/>
-					<CardContent></CardContent>
-				</Card>
-			</Modal> */}
 			<Table aria-label="collapsible table">
 				<TableHead>
 					<TableRow>

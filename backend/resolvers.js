@@ -62,6 +62,26 @@ const resolvers = {
       {}
     );
   },
+  incompletedstories: async (args) => {
+    let db = await rtn.getDBInstance();
+    let stories = await rtn.findAll(
+      db,
+      cfg.storyColl,
+      { sprints: args.sprintid },
+      {}
+    );
+    console.log(stories);
+    let incomplete = await stories.map(async (s) => {
+      let tasks = await rtn.findAll(
+        db,
+        cfg.taskColl,
+        { storyid: s._id.toString(), iscompleted: true },
+        {}
+      );
+      if (tasks.length > 0) return s;
+    });
+    return incomplete;
+  },
   //Mutations
   addproduct: async (args) => {
     let db = await rtn.getDBInstance();
@@ -262,10 +282,29 @@ const resolvers = {
           sprintname: "No sprint updated",
         };
   },
+  /*deleteproduct: async (args) => {
+    let db = await rtn.getDBInstance();
+    //let res = await rtn.deleteOne(db, cfg.productColl, { _id: args._id });
+    let users = await rtn.findAll(db, cfg.userColl, { products: args._id });
+    users.value.foreach(async (u) => {
+      if (u.products.includes(args._id)) {
+        u.products.splice(u.products.indexOf(args._id), 1);
+        await internalUserUpdate(u);
+      }
+    });
+  },*/
 };
 
 let internalProductUpdate = async (args) => {
   await resolvers.updateproduct(args);
+};
+
+let internalUserUpdate = async (args) => {
+  await resolvers.updateuser(args);
+};
+
+let findIncompleteTasks = async (args) => {
+  let db = await rtn.getDBInstance();
 };
 
 export default resolvers;

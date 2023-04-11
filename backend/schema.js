@@ -29,6 +29,7 @@
 //storiesbysprint(sprintid: String) [check]
 //tasksbystory(storyid: String) [check]
 //usersbyproject(productid: String) [check]
+//IncompletedStories(sprintid: String) [check]
 //project_setup: [?]
 
 const schema = `
@@ -43,6 +44,7 @@ type Query {
     tasksbystory(storyid: String): [Task]
     usersbyproduct(productid: String): [User]
     productsbyuser(userid: String) : [Product]
+    incompletedstories(sprintid: String) : [Story]
     project_setup: [String]
 },
 
@@ -109,9 +111,15 @@ type Mutation {
     updatestory(_id: String, storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
     updateproduct(_id: String, productname: String, teamname: String, startdate: String, enddate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: Int, sprints: [String]): Product,
     updatesprint(_id: String, productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
+    deleteproduct(_id: String) : String
+    deletesprint(_id: String) : String
+    deletestory(_id: String) : String
+    deletetask(_id: String) : String
+    deleteuser(_id: String) : String
 },
 `;
 /*
- * deletes [User, Task, Story, Product, Sprint] for all base object
+ * //addstories(sprintid: String, stories: [String]) []
+ * deletes [User, Task, Story, Product, Sprint] for all base object TO BE MADE
  */
 export default schema;

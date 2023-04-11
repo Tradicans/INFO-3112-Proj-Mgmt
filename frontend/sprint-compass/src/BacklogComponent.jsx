@@ -69,7 +69,7 @@ const BacklogComponent = (props) => {
 			});
 		}
 		//setState({ teamArray: [] });
-		// Dropdown list of all products uses this. This selects a product from the options available and takes it's product ID and list of current sprints. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
+		// Dropdown list of all products uses this. This selects a product from the options available and takes its product ID and list of current sprints. Then sets those in state under selectedProduct and sets the teammembers to the teamArray.
 	};
 	const readStoriesArray = async (e, selectedOption, reason) => {
 		if (reason === "clear" || selectedOption === null) {
