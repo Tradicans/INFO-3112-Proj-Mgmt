@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useReducer } from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
@@ -18,6 +18,7 @@ import theme from "./theme";
 import HomeComponent from "./HomeComponent";
 import ProjectInfoInputComponent from "./ProjectInfoInputComponent";
 import TeamMemberComponent from "./TeamMemberComponent";
+import BacklogComponent from "./BacklogComponent";
 
 const App = () => {
   const [anchorEl, setAnchorEl] = useState(null);
