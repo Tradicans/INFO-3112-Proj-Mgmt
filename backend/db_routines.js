@@ -22,6 +22,8 @@ const getDBInstance = async () => {
 const addOne = (db, coll, doc) => db.collection(coll).insertOne(doc);
 const count = (db, coll) => db.collection(coll).countDocuments();
 const deleteAll = (db, coll) => db.collection(coll).deleteMany({});
+const deleteMuch = (db, coll, criteria) =>
+  db.collection(coll).deleteMany(criteria);
 const addMany = (db, coll, docs) => db.collection(coll).insertMany(docs);
 const findOne = (db, coll, criteria) => db.collection(coll).findOne(criteria);
 const findAll = (db, coll, criteria, projection) =>
@@ -41,6 +43,7 @@ export {
   addOne,
   count,
   deleteAll,
+  deleteMuch,
   addMany,
   findOne,
   findAll,
