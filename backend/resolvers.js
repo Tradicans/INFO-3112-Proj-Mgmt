@@ -266,7 +266,14 @@ const resolvers = {
           sprintname: "No sprint updated",
         };
   },
-  deletetask: async (args) => {},
+  deletetask: async (args) => {
+    let db = await rtn.getDBInstance();
+    let deleted = await rtn.deleteOne(db, cfg.taskColl, {
+      _id: new rtn.ObjectId(args._id),
+    });
+    console.log(deleted);
+    return deleted.acknowledged ? "Deleted task" : "Task not found";
+  },
   /*deleteproduct: async (args) => {
     let db = await rtn.getDBInstance();
     //let res = await rtn.deleteOne(db, cfg.productColl, { _id: args._id });
