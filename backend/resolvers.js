@@ -1,6 +1,5 @@
 import * as rtn from "./db_routines.js";
 import * as cfg from "./config.js";
-import { ObjectId } from "mongodb";
 
 const resolvers = {
   //Queries
@@ -45,6 +44,10 @@ const resolvers = {
   tasksbystory: async (args) => {
     let db = await rtn.getDBInstance();
     return await rtn.findAll(db, cfg.taskColl, { storyid: args.storyid }, {});
+  },
+  tasksbyuser: async (args) => {
+    let db = await rtn.getDBInstance();
+    return await rtn.findAll(db, cfg.taskColl, { teammember: args.userid }, {});
   },
   usersbyproduct: async (args) => {
     let db = await rtn.getDBInstance();
@@ -95,8 +98,29 @@ const resolvers = {
   },
   adduser: async (args) => {
     let db = await rtn.getDBInstance();
-    let user = { name: args.name, role: args.role, products: [""] };
+    let user = { name: args.name, role: args.role, products: args.products };
+
     let results = await rtn.addOne(db, cfg.userColl, user);
+
+    args.products.forEach(async (prodId) => {
+      let product = await rtn.findOne(db, cfg.productColl, {
+        _id: new rtn.ObjectId(prodId),
+      });
+      if (product !== null) {
+        if (product.teammembers !== null) product.teammembers?.push(user._id);
+        else product.teammembers = [user._id];
+
+        let productResults = await rtn.updateOne(
+          db,
+          cfg.productColl,
+          { _id: new rtn.ObjectId(prodId) },
+          product
+        );
+      } else {
+        console.log("no product");
+      }
+    });
+
     return results.acknowledged ? user : null;
   },
   addsprint: async (args) => {
@@ -110,6 +134,24 @@ const resolvers = {
       stories: args.stories,
     };
     let results = await rtn.addOne(db, cfg.sprintColl, sprint);
+
+    let product = await rtn.findOne(db, cfg.productColl, {
+      _id: new rtn.ObjectId(sprint.productid),
+    });
+    if (product !== null) {
+      if (product.sprints !== null) product.sprints.push(sprint._id);
+      else product.sprints = [sprint._id];
+
+      let productResults = await rtn.updateOne(
+        db,
+        cfg.productColl,
+        { _id: product._id },
+        product
+      );
+
+      console.log(productResults);
+    }
+
     return results.acknowledged ? sprint : null;
   },
   addstory: async (args) => {
@@ -124,6 +166,19 @@ const resolvers = {
       tasks: args.tasks,
     };
     let results = await rtn.addOne(db, cfg.storyColl, story);
+
+    await story.sprints.forEach(async (sprintId) => {
+      let sprint = await rtn.findOne(db, cfg.sprintColl, {
+        _id: new rtn.ObjectId(sprintId),
+      });
+      if (sprint !== null) {
+        if (sprint.stories !== null) sprint.stories.push(story._id);
+        else sprint.stories = [story._id];
+
+        await rtn.updateOne(db, cfg.sprintColl, { _id: sprint._id }, sprint);
+      } else console.log(`!!!ERROR, NO SPRINT WITH ID ${sprintId}!!!`);
+    });
+
     return results.acknowledged ? story : null;
   },
   addtask: async (args) => {
@@ -132,11 +187,27 @@ const resolvers = {
       taskname: args.taskname,
       storyid: args.storyid,
       taskdetails: args.taskdetails,
-      teammember: args.teammember,
+      teammember: new rtn.ObjectId(args.teammember),
       hourscompleted: args.hourscompleted,
       iscompleted: args.iscompleted,
     };
+    let story = await rtn.findOne(db, cfg.storyColl, {
+      _id: new rtn.ObjectId(args.storyid),
+    });
     let results = await rtn.addOne(db, cfg.taskColl, task);
+    if (story._id === null) {
+      console.lot("!!!Story doesn't exist!!!");
+    } else {
+      if (story.tasks !== null) story.tasks.push(task._id);
+      else story.tasks = [task._id];
+      let storyResults = await rtn.updateOne(
+        db,
+        cfg.storyColl,
+        { _id: story._id },
+        story
+      );
+      console.log(storyResults);
+    }
     return results.acknowledged ? task : null;
   },
   updateuser: async (args) => {
@@ -164,7 +235,7 @@ const resolvers = {
     return results.value !== null
       ? args
       : {
-          _id: args._id,
+          _id: -1,
           name: "None found",
           role: "No user updated",
         };
@@ -208,6 +279,23 @@ const resolvers = {
         tasks: args.tasks,
       }
     );
+    await args.sprints.forEach(async (s) => {
+      let sprint = await rtn.findOne(db, cfg.sprintColl, { _id: s });
+      if (sprint !== null) {
+        if (sprint.stories !== null) {
+          if (!sprint.stories.includes(s)) {
+            sprint.stories.push(s);
+            let sprintResult = await rtn.updateOne(
+              db,
+              cfg.sprintColl,
+              { _id: sprint._id },
+              sprint
+            );
+            console.log(sprintResult);
+          }
+        } else sprint.stories = [s];
+      }
+    });
     return results.value !== null
       ? args
       : {
@@ -289,14 +377,6 @@ const resolvers = {
 
 let internalProductUpdate = async (args) => {
   await resolvers.updateproduct(args);
-};
-
-let internalUserUpdate = async (args) => {
-  await resolvers.updateuser(args);
-};
-
-let findIncompleteTasks = async (args) => {
-  let db = await rtn.getDBInstance();
 };
 
 export default resolvers;
