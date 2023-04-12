@@ -92,8 +92,7 @@ const StoryRow = (props) => {
 	const { storyrow } = props;
 	let storyid = storyrow._id;
 	getTasks(storyrow);
-	//
-	// let usersList = props.users;
+
 	const [open, setOpen] = React.useState(false);
 
 	const showTaskAddModal = () => {
@@ -125,11 +124,7 @@ const StoryRow = (props) => {
 	const onTaskAddClicked = async () => {
 		// code to add task to db
 
-		//todo: fill this in
-		let query = `mutation {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"${state.taskOwner.name}",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted},}`;
-		//todo: update sprint to include task
-		// let task = await queryFunction(query);
-		// query = `query {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
+		let query = `mutation {addtask(taskname:"${state.taskName}",storyid:"${storyid}",taskdetails:"${state.taskDesc}",teammember:"${state.taskOwner._id}",hourscompleted:0,iscompleted:false) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted}}`;
 
 		await queryFunction(query);
 		// reset state
@@ -172,13 +167,6 @@ const StoryRow = (props) => {
 								textAlign: "center",
 							}}
 						>
-							{/* <TextField
-								style={{ margin: "1%", width: "48%" }}
-								onChange={handleTaskOwnerInput}
-								placeholder="Team Member"
-								value={state.taskOwner}
-							/> */}
-							{/* done: change to dropdown autofill */}
 							<Autocomplete
 								id="userField"
 								options={state.usersList}
@@ -276,14 +264,18 @@ const StoryRow = (props) => {
 										<TableCell>Name</TableCell>
 										<TableCell>Details</TableCell>
 										<TableCell>Team Member</TableCell>
-										<TableCell>Additional Hours Complete</TableCell>
+										<TableCell>Total Hours Completed</TableCell>
 										<TableCell>Add to Sprint</TableCell>
 										<TableCell>Update Task</TableCell>
 									</TableRow>
 								</TableHead>
 								<TableBody>
 									{taskrows.map((taskrow) => (
-										<TaskRow key={taskrow._id} taskrow={taskrow} />
+										<TaskRow
+											key={taskrow._id}
+											taskrow={taskrow}
+											story={storyrow}
+										/>
 									))}
 								</TableBody>
 							</Table>
@@ -298,25 +290,18 @@ const StoryRow = (props) => {
 const TaskRow = (props) => {
 	const { taskrow } = props;
 	let taskRowState = {
-		taskRowUser: taskrow.teammember,
 		taskRowHrs: taskrow.hourscompleted,
 		taskRowSprint: "",
-		taskRowComplete: false,
+		taskRowComplete: taskrow.iscompleted,
 	};
-	const handleClick = () => {
+	const handleClick = async () => {
 		taskRowState.taskRowComplete = !taskRowState.taskRowComplete;
+		let query = "";
+		query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${taskrow.teammember}", hourscompleted:${taskrow.hourscompleted}, iscompleted:${taskRowState.taskRowComplete}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
+		await queryFunction(query);
 	};
-	const handleUserNameInput = (e, selectedOption, reason) => {
-		//update assigned user
-		if (reason === "clear" || selectedOption === null) {
-			taskRowState.taskRowUser = taskrow.teammember;
-		} else {
-			//adding by name instead of id
-			taskRowState.taskRowUser = selectedOption.name;
-		}
-	};
+
 	const handleHrsInput = (e) => {
-		//update hrs - adding to total hrs for task
 		taskRowState.taskRowHrs = e.target.value;
 	};
 	const handleSprintChange = (e, selectedOption, reason) => {
@@ -328,25 +313,39 @@ const TaskRow = (props) => {
 		}
 	};
 	const updateTask = async () => {
-		//todo: math is broken, this replaces value with entered value
-		taskRowState.taskRowHrs == taskRowState.taskRowHrs + taskrow.hourscompleted;
 		let query = "";
-		query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${taskRowState.taskRowUser}", hourscompleted:${taskRowState.taskRowHrs}, iscompleted:${taskRowState.taskRowComplete}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
+		query = `mutation{updatetask(_id:"${taskrow._id}", taskname:"${taskrow.taskname}", storyid:"${taskrow.storyid}", taskdetails:"${taskrow.taskdetails}", teammember:"${taskrow.teammember}", hourscompleted:${taskRowState.taskRowHrs}, iscompleted:${taskrow.iscompleted}) {_id, taskname, storyid, taskdetails, teammember, hourscompleted, iscompleted  }}`;
 		await queryFunction(query);
 		if (taskRowState.taskRowSprint !== "") {
-			//todo - additional query to update sprint
-			//use state.storyid with updatestory mutation
-			//also update sprint to list story?
+			//update story to include new sprint
+			//TODO - GET THIS WORKING TO ADD SPRINT TO ARRAY WITHIN STORY OBJECT-----------------------------------------------------------------------------------------
+			//--------------------------------------------------------------------------------------------------------------------------------------------------------------
+			//-----------------------------------------------------------------------------------------------------------------------------------
+			//get story info from props
+			const story = props.story;
+			const sprints = story.sprints;
+			sprints.push(taskRowState.taskRowSprint);
+
+			query = `mutation{updatestory(_id:"${story._id}", storyname:"${story.storyname}", storydescription:"${story.storydescription}", sprints:"${sprints}", storypoints:${story.storypoints}, costperhour:${story.costperhour}, priority:${story.priority}, tasks:"${story.tasks}") {_id, storyname, storydescription, sprints, storypoints, costperhour, priority, tasks  }}`;
+			await queryFunction(query);
 		}
 
 		//reset fields
 		taskRowState = {
-			taskRowUser: taskrow.teammember,
 			taskRowHrs: taskrow.hourscompleted,
 			taskRowSprint: "",
-			taskRowComplete: false,
+			taskRowComplete: taskrow.iscompleted,
 		};
 	};
+	function selectName(id) {
+		let userName = "";
+		state.usersList.forEach((user) => {
+			if (id === user._id) userName = user.name;
+		});
+
+		return userName;
+	}
+
 	return (
 		<React.Fragment>
 			<TableRow
@@ -372,45 +371,11 @@ const TaskRow = (props) => {
 					{taskrow.taskname}
 				</TableCell>
 				<TableCell>{taskrow.taskdetails}</TableCell>
+				<TableCell>{selectName(taskrow.teammember)}</TableCell>
 				<TableCell>
-					{/* <TextField
-						onChange={handleUserNameInput}
-						placeholder="Team Member"
-						value={taskrow.teammember}
-					/> */}
-					<Autocomplete
-						id="rowUserField"
-						options={state.usersList}
-						getOptionLabel={(option) => option.name}
-						onChange={handleUserNameInput}
-						//
-						renderInput={(params) => (
-							<TextField
-								style={{
-									margin: "1%",
-									width: "90%",
-									flexWrap: "nowrap",
-									overflowX: "scroll",
-								}}
-								{...params}
-								label={taskrow.teammember}
-								fullWidth="false"
-								variant="outlined"
-								data-testid="userField"
-							/>
-						)}
-					/>
+					<TextField onChange={handleHrsInput} label={taskrow.hourscompleted} />
 				</TableCell>
 				<TableCell>
-					<TextField onChange={handleHrsInput} placeholder="Hours Completed" />
-				</TableCell>
-				{/* todo: make teammember an autocomplete textbox 											 */}
-				<TableCell>
-					{/* <TextField
-						onChange={handleSprintChange}
-						placeholder="Select sprint"
-						// value={taskRow.addtosprint}
-					/> */}
 					<Autocomplete
 						id="rowSprintField"
 						options={state.sprintArray}
@@ -434,7 +399,6 @@ const TaskRow = (props) => {
 						)}
 					/>
 				</TableCell>
-				{/* todo: make sprint an autocomplete textbox 											 */}
 				<TableCell>
 					<Button
 						style={{ margin: "1%", width: "25%" }}
