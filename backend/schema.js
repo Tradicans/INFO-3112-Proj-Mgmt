@@ -42,6 +42,7 @@ type Query {
     sprintsbyproduct(productid: String): [Sprint]
     storiesbysprint(sprintid: String): [Story]
     tasksbystory(storyid: String): [Task]
+    tasksbyuser(userid: String): [Task]
     usersbyproduct(productid: String): [User]
     productsbyuser(userid: String) : [Product]
     incompletedstories(sprintid: String) : [Story]
@@ -102,7 +103,7 @@ type Task {
 
 type Mutation {
     addproduct(productname: String, teamname: String, startdate: String, enddate: String, productowner: String, teammembers: [String], hoursperstorypoint: Int, estimatestorypoints: Int, estimatetotalcost: Int, sprints: [String]): Product,
-    adduser(name: String, role: String): User,
+    adduser(name: String, role: String, products:[String]): User,
     addsprint(productid: String, sprintname: String, startdate: String, enddate: String, iscompleted: Boolean, stories: [String]): Sprint,
     addstory(storyname: String, storydescription: String, sprints: [String], storypoints: Int, costperhour: Float, priority: Int, tasks: [String]): Story,
     addtask(taskname: String, storyid: String, taskdetails: String, teammember: String, hourscompleted: Int, iscompleted: Boolean): Task,
